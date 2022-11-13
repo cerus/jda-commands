@@ -50,8 +50,8 @@ public class GenericEvent extends Event {
     }
 
     protected GenericEvent(final GenericEvent event) {
-        this(event.getJDA(), event.getResponseNumber(), event.getGuild(), event.getUser(), event.getMember(),
-                event.getChannel(), event.getChannelType(), event.getMessage());
+        this(event.getJDA(), event.getResponseNumber(), event.isFromGuild() ? event.getGuild() : null, event.getUser(),
+                event.isFromGuild() ? event.getMember() : null, event.getChannel(), event.getChannelType(), event.getMessage());
     }
 
     /**
@@ -63,8 +63,8 @@ public class GenericEvent extends Event {
      */
     @NotNull
     public static GenericEvent fromEvent(@NotNull final MessageReceivedEvent event) {
-        return new GenericEvent(event.getJDA(), event.getResponseNumber(), event.getGuild(),
-                event.getAuthor(), event.getMember(), event.getChannel(), event.getChannelType(), event.getMessage());
+        return new GenericEvent(event.getJDA(), event.getResponseNumber(), event.isFromGuild() ? event.getGuild() : null,
+                event.getAuthor(), event.isFromGuild() ? event.getMember() : null, event.getChannel(), event.getChannelType(), event.getMessage());
     }
 
     /**
@@ -76,8 +76,8 @@ public class GenericEvent extends Event {
      */
     @NotNull
     public static GenericEvent fromEvent(@NotNull final GenericInteractionCreateEvent event) {
-        return new GenericEvent(event.getJDA(), event.getResponseNumber(), event.getGuild(),
-                event.getUser(), event.getMember(), event.getMessageChannel(), event.getChannelType(), null);
+        return new GenericEvent(event.getJDA(), event.getResponseNumber(), event.isFromGuild() ? event.getGuild() : null,
+                event.getUser(), event.isFromGuild() ? event.getMember() : null, event.getMessageChannel(), event.getChannelType(), null);
     }
 
     /**
