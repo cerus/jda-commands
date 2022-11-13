@@ -1,7 +1,18 @@
 package com.github.kaktushose.jda.commands.dispatching;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,8 +38,8 @@ public class GenericEvent extends Event {
     private final ChannelType channelType;
     private final Message message;
 
-    protected GenericEvent(JDA api, long responseNumber, Guild guild, User user, Member member,
-                           MessageChannel channel, ChannelType channelType, Message message) {
+    protected GenericEvent(final JDA api, final long responseNumber, final Guild guild, final User user, final Member member,
+                           final MessageChannel channel, final ChannelType channelType, final Message message) {
         super(api, responseNumber);
         this.guild = guild;
         this.user = user;
@@ -38,7 +49,7 @@ public class GenericEvent extends Event {
         this.message = message;
     }
 
-    protected GenericEvent(GenericEvent event) {
+    protected GenericEvent(final GenericEvent event) {
         this(event.getJDA(), event.getResponseNumber(), event.getGuild(), event.getUser(), event.getMember(),
                 event.getChannel(), event.getChannelType(), event.getMessage());
     }
@@ -47,10 +58,11 @@ public class GenericEvent extends Event {
      * Constructs a new {@link GenericEvent} from a {@link MessageReceivedEvent}.
      *
      * @param event the {@link MessageReceivedEvent} to construct from
+     *
      * @return a {@link GenericEvent}
      */
     @NotNull
-    public static GenericEvent fromEvent(@NotNull MessageReceivedEvent event) {
+    public static GenericEvent fromEvent(@NotNull final MessageReceivedEvent event) {
         return new GenericEvent(event.getJDA(), event.getResponseNumber(), event.getGuild(),
                 event.getAuthor(), event.getMember(), event.getChannel(), event.getChannelType(), event.getMessage());
     }
@@ -59,10 +71,11 @@ public class GenericEvent extends Event {
      * Constructs a new {@link GenericEvent} from a {@link SlashCommandInteractionEvent}.
      *
      * @param event the {@link SlashCommandInteractionEvent} to construct from
+     *
      * @return a {@link GenericEvent}
      */
     @NotNull
-    public static GenericEvent fromEvent(@NotNull GenericInteractionCreateEvent event) {
+    public static GenericEvent fromEvent(@NotNull final GenericInteractionCreateEvent event) {
         return new GenericEvent(event.getJDA(), event.getResponseNumber(), event.getGuild(),
                 event.getUser(), event.getMember(), event.getMessageChannel(), event.getChannelType(), null);
     }
@@ -73,6 +86,7 @@ public class GenericEvent extends Event {
      * this will throw an {@link java.lang.IllegalStateException}.
      *
      * @return The Guild the Message was received in
+     *
      * @throws IllegalStateException If this was not sent in a {@link TextChannel}
      * @see #isFromGuild()
      * @see #isFromType(ChannelType)
@@ -80,10 +94,10 @@ public class GenericEvent extends Event {
      */
     @NotNull
     public Guild getGuild() {
-        if (!isFromGuild()) {
+        if (!this.isFromGuild()) {
             throw new IllegalStateException("This message event did not happen in a guild");
         }
-        return guild;
+        return this.guild;
     }
 
     /**
@@ -93,7 +107,7 @@ public class GenericEvent extends Event {
      * @return {@code true}, if {@link #getChannelType()}.{@link ChannelType#isGuild() isGuild()} is true
      */
     public boolean isFromGuild() {
-        return channelType.isGuild();
+        return this.channelType.isGuild();
     }
 
     /**
@@ -102,11 +116,12 @@ public class GenericEvent extends Event {
      * See {@link Webhook#getDefaultUser()}.
      *
      * @return The Author of the Message
+     *
      * @see Message#isWebhookMessage()
      */
     @NotNull
     public User getUser() {
-        return user;
+        return this.user;
     }
 
     /**
@@ -115,11 +130,12 @@ public class GenericEvent extends Event {
      * See {@link Webhook#getDefaultUser()}.
      *
      * @return The Author of the Message
+     *
      * @see Message#isWebhookMessage()
      */
     @NotNull
     public User getAuthor() {
-        return user;
+        return this.user;
     }
 
     /**
@@ -129,11 +145,12 @@ public class GenericEvent extends Event {
      * or {@link Message#isWebhookMessage() isWebhookMessage()} returning {@code true}.
      *
      * @return The Author of the Message as null-able Member object
+     *
      * @see Message#isWebhookMessage()
      */
     @Nullable
     public Member getMember() {
-        return member;
+        return this.member;
     }
 
     /**
@@ -144,7 +161,7 @@ public class GenericEvent extends Event {
      */
     @Nullable
     public Message getMessage() {
-        return message;
+        return this.message;
     }
 
     /**
@@ -154,7 +171,7 @@ public class GenericEvent extends Event {
      */
     @NotNull
     public MessageChannel getChannel() {
-        return channel;
+        return this.channel;
     }
 
     /**
@@ -162,16 +179,17 @@ public class GenericEvent extends Event {
      * <br>If this Message was not received in a {@link NewsChannel}, this will throw an {@link IllegalStateException}.
      *
      * @return The NewsChannel the Message was received in
+     *
      * @throws IllegalStateException If this was not sent in a {@link NewsChannel}
      * @see #isFromGuild()
      * @see #isFromType(ChannelType)
      * @see #getChannelType()
      */
     public NewsChannel getNewsChannel() {
-        if (channel instanceof NewsChannel) {
-            return (NewsChannel) channel;
+        if (this.channel instanceof NewsChannel) {
+            return (NewsChannel) this.channel;
         } else {
-            throw new IllegalStateException("Cannot convert channel of type " + channelType + " to NewsChannel");
+            throw new IllegalStateException("Cannot convert channel of type " + this.channelType + " to NewsChannel");
         }
     }
 
@@ -180,6 +198,7 @@ public class GenericEvent extends Event {
      * <br>If this Message was not received in a {@link TextChannel}, this will throw an {@link IllegalStateException}.
      *
      * @return The TextChannel the Message was received in
+     *
      * @throws IllegalStateException If this was not sent in a {@link TextChannel}
      * @see #isFromGuild()
      * @see #isFromType(ChannelType)
@@ -187,10 +206,10 @@ public class GenericEvent extends Event {
      */
     @NotNull
     public TextChannel getTextChannel() {
-        if (channel instanceof TextChannel) {
-            return (TextChannel) channel;
+        if (this.channel instanceof TextChannel) {
+            return (TextChannel) this.channel;
         } else {
-            throw new IllegalStateException("Cannot convert channel of type " + channelType + " to TextChannel");
+            throw new IllegalStateException("Cannot convert channel of type " + this.channelType + " to TextChannel");
         }
     }
 
@@ -199,16 +218,17 @@ public class GenericEvent extends Event {
      * <br>If this Message was not received in a {@link ThreadChannel}, this will throw an {@link IllegalStateException}.
      *
      * @return The ThreadChannel the Message was received in
+     *
      * @throws IllegalStateException If this was not sent in a {@link ThreadChannel}
      * @see #isFromGuild()
      * @see #isFromType(ChannelType)
      * @see #getChannelType()
      */
     public ThreadChannel getThreadChannel() {
-        if (channel instanceof ThreadChannel) {
-            return (ThreadChannel) channel;
+        if (this.channel instanceof ThreadChannel) {
+            return (ThreadChannel) this.channel;
         } else {
-            throw new IllegalStateException("Cannot convert channel of type " + channelType + " to ThreadChannel");
+            throw new IllegalStateException("Cannot convert channel of type " + this.channelType + " to ThreadChannel");
         }
     }
 
@@ -217,16 +237,17 @@ public class GenericEvent extends Event {
      * <br>If this Message was not received in a {@link GuildChannel}, this will throw an {@link IllegalStateException}.
      *
      * @return The GuildChannel the Message was received in
+     *
      * @throws IllegalStateException If this was not sent in a {@link GuildChannel}
      * @see #isFromGuild()
      * @see #isFromType(ChannelType)
      * @see #getChannelType()
      */
     public GuildChannel getGuildChannel() {
-        if (channel instanceof GuildChannel) {
-            return (GuildChannel) channel;
+        if (this.channel instanceof GuildChannel) {
+            return (GuildChannel) this.channel;
         } else {
-            throw new IllegalStateException("Cannot convert channel of type " + channelType + " to GuildChannel");
+            throw new IllegalStateException("Cannot convert channel of type " + this.channelType + " to GuildChannel");
         }
     }
 
@@ -235,16 +256,17 @@ public class GenericEvent extends Event {
      * <br>If this Message was not received in a {@link PrivateChannel}, this will throw an {@link IllegalStateException}.
      *
      * @return The PrivateChannel the Message was received in
+     *
      * @throws IllegalStateException If this was not sent in a {@link PrivateChannel}
      * @see #isFromGuild()
      * @see #isFromType(ChannelType)
      * @see #getChannelType()
      */
     public PrivateChannel getPrivateChannel() {
-        if (channel instanceof PrivateChannel) {
-            return (PrivateChannel) channel;
+        if (this.channel instanceof PrivateChannel) {
+            return (PrivateChannel) this.channel;
         } else {
-            throw new IllegalStateException("Cannot convert channel of type " + channelType + " to PrivateChannel");
+            throw new IllegalStateException("Cannot convert channel of type " + this.channelType + " to PrivateChannel");
         }
     }
 
@@ -255,16 +277,17 @@ public class GenericEvent extends Event {
      */
     @NotNull
     public ChannelType getChannelType() {
-        return channelType;
+        return this.channelType;
     }
 
     /**
      * Indicates whether the message is from the specified {@link ChannelType}.
      *
      * @param type The ChannelType
+     *
      * @return {@code true}, if the message is from the specified channel type
      */
-    public boolean isFromType(ChannelType type) {
-        return type == channelType;
+    public boolean isFromType(final ChannelType type) {
+        return type == this.channelType;
     }
 }

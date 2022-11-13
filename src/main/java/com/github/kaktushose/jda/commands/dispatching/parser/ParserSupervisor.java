@@ -6,6 +6,8 @@ import com.github.kaktushose.jda.commands.dispatching.parser.impl.DefaultMessage
 import com.github.kaktushose.jda.commands.dispatching.parser.impl.DefaultSlashCommandParser;
 import com.github.kaktushose.jda.commands.dispatching.parser.impl.MigratingMessageParser;
 import com.github.kaktushose.jda.commands.dispatching.sender.MessageSender;
+import java.util.HashMap;
+import java.util.Map;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,9 +15,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Registry for {@link Parser Parsers}. This is also the event listener that will call the corresponding parser.
@@ -36,23 +35,23 @@ public class ParserSupervisor extends ListenerAdapter {
      *
      * @param dispatcher the calling {@link CommandDispatcher}
      */
-    public ParserSupervisor(@NotNull CommandDispatcher dispatcher) {
-        listeners = new HashMap<>();
+    public ParserSupervisor(@NotNull final CommandDispatcher dispatcher) {
+        this.listeners = new HashMap<>();
         this.dispatcher = dispatcher;
         switch (dispatcher.getSlashConfiguration().getPolicy()) {
             case TEXT:
-                register(MessageReceivedEvent.class, new DefaultMessageParser());
+                this.register(MessageReceivedEvent.class, new DefaultMessageParser());
                 break;
             case SLASH:
-                register(SlashCommandInteractionEvent.class, new DefaultSlashCommandParser());
+                this.register(SlashCommandInteractionEvent.class, new DefaultSlashCommandParser());
                 break;
             case TEXT_AND_SLASH:
-                register(MessageReceivedEvent.class, new DefaultMessageParser());
-                register(SlashCommandInteractionEvent.class, new DefaultSlashCommandParser());
+                this.register(MessageReceivedEvent.class, new DefaultMessageParser());
+                this.register(SlashCommandInteractionEvent.class, new DefaultSlashCommandParser());
                 break;
             case MIGRATING:
-                register(MessageReceivedEvent.class, new MigratingMessageParser());
-                register(SlashCommandInteractionEvent.class, new DefaultSlashCommandParser());
+                this.register(MessageReceivedEvent.class, new MigratingMessageParser());
+                this.register(SlashCommandInteractionEvent.class, new DefaultSlashCommandParser());
                 break;
         }
     }
@@ -63,8 +62,8 @@ public class ParserSupervisor extends ListenerAdapter {
      * @param listener the subtype of {@link GenericEvent}
      * @param parser   the {@link Parser} to register
      */
-    public void register(@NotNull Class<? extends GenericEvent> listener, @NotNull Parser<? extends GenericEvent> parser) {
-        listeners.put(listener, parser);
+    public void register(@NotNull final Class<? extends GenericEvent> listener, @NotNull final Parser<? extends GenericEvent> parser) {
+        this.listeners.put(listener, parser);
         log.debug("Registered parser {} for event {}", parser.getClass().getName(), listener.getSimpleName());
     }
 
@@ -73,8 +72,8 @@ public class ParserSupervisor extends ListenerAdapter {
      *
      * @param listener the subtype of {@link GenericEvent}
      */
-    public void unregister(@NotNull Class<? extends GenericEvent> listener) {
-        listeners.remove(listener);
+    public void unregister(@NotNull final Class<? extends GenericEvent> listener) {
+        this.listeners.remove(listener);
         log.debug("Unregistered parser binding for event {}", listener.getSimpleName());
     }
 
@@ -85,28 +84,28 @@ public class ParserSupervisor extends ListenerAdapter {
      * @param event the {@link GenericEvent GenericEvents} to distribute
      */
     @Override
-    public void onGenericEvent(@NotNull GenericEvent event) {
-        if (!listeners.containsKey(event.getClass())) {
+    public void onGenericEvent(@NotNull final GenericEvent event) {
+        if (!this.listeners.containsKey(event.getClass())) {
             return;
         }
         log.debug("Received {}", event.getClass().getSimpleName());
-        Parser<?> parser = listeners.get(event.getClass());
+        final Parser<?> parser = this.listeners.get(event.getClass());
         log.debug("Calling {}", parser.getClass().getName());
-        CommandContext context = parser.parseInternal(event, dispatcher);
+        final CommandContext context = parser.parseInternal(event, this.dispatcher);
 
-        MessageSender sender = context.getImplementationRegistry().getMessageSender();
+        final MessageSender sender = context.getImplementationRegistry().getMessageSender();
 
         if (context.isCancelled()) {
             if (context.getErrorMessage() != null) {
-                sender.sendErrorMessage(context, context.getErrorMessage());
+                sender.sendErrorMessage(context, context.getErrorMessage().build());
             }
             return;
         }
 
         try {
-            dispatcher.onEvent(context);
-        } catch (Exception e) {
-            sender.sendErrorMessage(context, context.getImplementationRegistry().getErrorMessageFactory().getCommandExecutionFailedMessage(context, e));
+            this.dispatcher.onEvent(context);
+        } catch (final Exception e) {
+            sender.sendErrorMessage(context, context.getImplementationRegistry().getErrorMessageFactory().getCommandExecutionFailedMessage(context, e).build());
             log.error("Command execution failed!", e);
         }
     }

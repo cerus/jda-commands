@@ -1,23 +1,21 @@
 package adapting.mock;
 
+import java.util.EnumSet;
+import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
-import java.util.List;
-
-@SuppressWarnings("ConstantConditions")
 public class UserMock implements User {
 
     private final String name;
     private final long id;
 
-    public UserMock(String name, long id) {
+    public UserMock(final String name, final long id) {
         this.name = name;
         this.id = id;
     }
@@ -25,7 +23,7 @@ public class UserMock implements User {
     @NotNull
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @NotNull
@@ -48,7 +46,7 @@ public class UserMock implements User {
 
     @NotNull
     @Override
-    public RestAction<Profile> retrieveProfile() {
+    public CacheRestAction<Profile> retrieveProfile() {
         return null;
     }
 
@@ -65,7 +63,7 @@ public class UserMock implements User {
 
     @NotNull
     @Override
-    public RestAction<PrivateChannel> openPrivateChannel() {
+    public CacheRestAction<PrivateChannel> openPrivateChannel() {
         return null;
     }
 
@@ -110,6 +108,6 @@ public class UserMock implements User {
 
     @Override
     public long getIdLong() {
-        return id;
+        return this.id;
     }
 }

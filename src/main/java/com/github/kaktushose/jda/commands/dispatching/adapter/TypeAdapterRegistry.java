@@ -6,13 +6,28 @@ import com.github.kaktushose.jda.commands.dispatching.adapter.impl.*;
 import com.github.kaktushose.jda.commands.embeds.error.ErrorMessageFactory;
 import com.github.kaktushose.jda.commands.reflect.CommandDefinition;
 import com.github.kaktushose.jda.commands.reflect.ParameterDefinition;
-import net.dv8tion.jda.api.entities.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * Central registry for all type adapters.
@@ -40,32 +55,32 @@ public class TypeAdapterRegistry {
      * </ul>
      */
     public TypeAdapterRegistry() {
-        parameterAdapters = new HashMap<>();
+        this.parameterAdapters = new HashMap<>();
 
         // default types
-        register(Byte.class, new ByteAdapter());
-        register(Short.class, new ShortAdapter());
-        register(Integer.class, new IntegerAdapter());
-        register(Long.class, new LongAdapter());
-        register(Float.class, new FloatAdapter());
-        register(Double.class, new DoubleAdapter());
-        register(Character.class, new CharacterAdapter());
-        register(Boolean.class, new BooleanAdapter());
-        register(String.class, (TypeAdapter<String>) (raw, guild) -> Optional.of(raw));
-        register(String[].class, (TypeAdapter<String>) (raw, guild) -> Optional.of(raw));
+        this.register(Byte.class, new ByteAdapter());
+        this.register(Short.class, new ShortAdapter());
+        this.register(Integer.class, new IntegerAdapter());
+        this.register(Long.class, new LongAdapter());
+        this.register(Float.class, new FloatAdapter());
+        this.register(Double.class, new DoubleAdapter());
+        this.register(Character.class, new CharacterAdapter());
+        this.register(Boolean.class, new BooleanAdapter());
+        this.register(String.class, (TypeAdapter<String>) (raw, guild) -> Optional.of(raw));
+        this.register(String[].class, (TypeAdapter<String>) (raw, guild) -> Optional.of(raw));
 
         // jda specific
-        register(Member.class, new MemberAdapter());
-        register(User.class, new UserAdapter());
-        register(GuildChannel.class, new GuildChannelAdapter());
-        register(GuildMessageChannel.class, new GuildMessageChannelAdapter());
-        register(ThreadChannel.class, new ThreadChannelAdapter());
-        register(TextChannel.class, new TextChannelAdapter());
-        register(NewsChannel.class, new NewsChannelAdapter());
-        register(AudioChannel.class, new AudioChannelAdapter());
-        register(VoiceChannel.class, new VoiceChannelAdapter());
-        register(StageChannel.class, new StageChannelAdapter());
-        register(Role.class, new RoleAdapter());
+        this.register(Member.class, new MemberAdapter());
+        this.register(User.class, new UserAdapter());
+        this.register(GuildChannel.class, new GuildChannelAdapter());
+        this.register(GuildMessageChannel.class, new GuildMessageChannelAdapter());
+        this.register(ThreadChannel.class, new ThreadChannelAdapter());
+        this.register(TextChannel.class, new TextChannelAdapter());
+        this.register(NewsChannel.class, new NewsChannelAdapter());
+        this.register(AudioChannel.class, new AudioChannelAdapter());
+        this.register(VoiceChannel.class, new VoiceChannelAdapter());
+        this.register(StageChannel.class, new StageChannelAdapter());
+        this.register(Role.class, new RoleAdapter());
     }
 
     /**
@@ -74,8 +89,8 @@ public class TypeAdapterRegistry {
      * @param type    the type the adapter is for
      * @param adapter the {@link TypeAdapter}
      */
-    public void register(@NotNull Class<?> type, @NotNull TypeAdapter<?> adapter) {
-        parameterAdapters.put(type, adapter);
+    public void register(@NotNull final Class<?> type, @NotNull final TypeAdapter<?> adapter) {
+        this.parameterAdapters.put(type, adapter);
         log.debug("Registered adapter {} for type {}", adapter.getClass().getName(), type.getName());
     }
 
@@ -84,8 +99,8 @@ public class TypeAdapterRegistry {
      *
      * @param type the type the adapter is for
      */
-    public void unregister(@NotNull Class<?> type) {
-        parameterAdapters.remove(type);
+    public void unregister(@NotNull final Class<?> type) {
+        this.parameterAdapters.remove(type);
         log.debug("Unregistered adapter for type {}", type.getName());
     }
 
@@ -93,20 +108,22 @@ public class TypeAdapterRegistry {
      * Checks if a type adapter for the given type exists.
      *
      * @param type the type to check
+     *
      * @return {@code true} if a type adapter exists
      */
-    public boolean exists(@Nullable Class<?> type) {
-        return parameterAdapters.containsKey(type);
+    public boolean exists(@Nullable final Class<?> type) {
+        return this.parameterAdapters.containsKey(type);
     }
 
     /**
      * Retrieves a type adapter.
      *
      * @param type the type to get the adapter for
+     *
      * @return the type adapter or an empty Optional if none found
      */
-    public Optional<TypeAdapter<?>> get(@Nullable Class<?> type) {
-        return Optional.ofNullable(parameterAdapters.get(type));
+    public Optional<TypeAdapter<?>> get(@Nullable final Class<?> type) {
+        return Optional.ofNullable(this.parameterAdapters.get(type));
     }
 
     /**
@@ -115,17 +132,17 @@ public class TypeAdapterRegistry {
      *
      * @param context the {@link CommandContext} to type adapt
      */
-    public void adapt(@NotNull CommandContext context) {
-        CommandDefinition command = Objects.requireNonNull(context.getCommand());
-        List<Object> arguments = new ArrayList<>();
-        String[] input = context.getInput();
-        ErrorMessageFactory messageFactory = context.getImplementationRegistry().getErrorMessageFactory();
+    public void adapt(@NotNull final CommandContext context) {
+        final CommandDefinition command = Objects.requireNonNull(context.getCommand());
+        final List<Object> arguments = new ArrayList<>();
+        final String[] input = context.getInput();
+        final ErrorMessageFactory messageFactory = context.getImplementationRegistry().getErrorMessageFactory();
 
         log.debug("Type adapting arguments...");
         arguments.add(new CommandEvent(command, context));
         // start with index 1 so we skip the CommandEvent
         for (int i = 0; i < command.getActualParameters().size(); i++) {
-            ParameterDefinition parameter = command.getActualParameters().get(i);
+            final ParameterDefinition parameter = command.getActualParameters().get(i);
 
             // if parameter is array don't parse
             if (String[].class.isAssignableFrom(parameter.getType())) {
@@ -134,7 +151,7 @@ public class TypeAdapterRegistry {
                 break;
             }
 
-            String raw;
+            final String raw;
             // current parameter index == total amount of input, check if it's optional else cancel context
             if (i == input.length) {
                 if (!parameter.isOptional()) {
@@ -157,8 +174,8 @@ public class TypeAdapterRegistry {
             }
 
             if (i == command.getActualParameters().size() - 1 && parameter.isConcat()) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : Arrays.copyOfRange(input, i, input.length)) {
+                final StringBuilder sb = new StringBuilder();
+                for (final String s : Arrays.copyOfRange(input, i, input.length)) {
                     sb.append(s).append(" ");
                 }
                 arguments.add(sb.toString().trim());
@@ -167,12 +184,12 @@ public class TypeAdapterRegistry {
 
             log.debug("Trying to adapt input \"{}\" to type {}", raw, parameter.getType().getName());
 
-            Optional<TypeAdapter<?>> adapter = get(parameter.getType());
+            final Optional<TypeAdapter<?>> adapter = this.get(parameter.getType());
             if (!adapter.isPresent()) {
                 throw new IllegalArgumentException("No type adapter found!");
             }
 
-            Optional<?> parsed = adapter.get().parse(raw, context);
+            final Optional<?> parsed = adapter.get().parse(raw, context);
             if (!parsed.isPresent()) {
                 log.debug("Type adapting failed!");
                 context.setCancelled(true);

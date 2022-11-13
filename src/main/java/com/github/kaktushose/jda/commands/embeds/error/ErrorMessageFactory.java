@@ -4,6 +4,8 @@ import com.github.kaktushose.jda.commands.dispatching.CommandContext;
 import com.github.kaktushose.jda.commands.interactions.commands.CommandRegistrationPolicy;
 import com.github.kaktushose.jda.commands.reflect.ConstraintDefinition;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,83 +22,93 @@ public interface ErrorMessageFactory {
      * Gets a {@link Message} to send when no command was found.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when no command was found
      */
-    Message getCommandNotFoundMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getCommandNotFoundMessage(@NotNull CommandContext context);
 
     /**
      * Gets a {@link Message} to send when a user is missing permissions.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when a user is missing permissions
      */
-    Message getInsufficientPermissionsMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getInsufficientPermissionsMessage(@NotNull CommandContext context);
 
     /**
      * Gets a {@link Message} to send when a {@link net.dv8tion.jda.api.entities.Guild Guild} is muted.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when a {@link net.dv8tion.jda.api.entities.Guild Guild} is muted
      */
-    Message getGuildMutedMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getGuildMutedMessage(@NotNull CommandContext context);
 
     /**
-     * Gets a {@link Message} to send when a {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} is muted.
+     * Gets a {@link Message} to send when a {@link TextChannel TextChannel} is muted.
      *
      * @param context the corresponding {@link CommandContext}
-     * @return a {@link Message} to send when a {@link net.dv8tion.jda.api.entities.TextChannel TextChannel} is muted
+     *
+     * @return a {@link Message} to send when a {@link TextChannel TextChannel} is muted
      */
-    Message getChannelMutedMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getChannelMutedMessage(@NotNull CommandContext context);
 
     /**
      * Gets a {@link Message} to send when a {@link net.dv8tion.jda.api.entities.User User} is muted.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when a {@link net.dv8tion.jda.api.entities.User User} is muted
      */
-    Message getUserMutedMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getUserMutedMessage(@NotNull CommandContext context);
 
     /**
      * Gets a {@link Message} to send when the user input has a syntax error.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when the user input has a syntax error
      */
-    Message getSyntaxErrorMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getSyntaxErrorMessage(@NotNull CommandContext context);
 
     /**
      * Gets a {@link Message} to send when a parameter constraint fails.
      *
      * @param context    the corresponding {@link CommandContext}
      * @param constraint the corresponding {@link ConstraintDefinition} that failed
+     *
      * @return a {@link Message} to send when a parameter constraint fails
      */
-    Message getConstraintFailedMessage(@NotNull CommandContext context, @NotNull ConstraintDefinition constraint);
+    MessageCreateBuilder getConstraintFailedMessage(@NotNull CommandContext context, @NotNull ConstraintDefinition constraint);
 
     /**
      * Gets a {@link Message} to send when a command still has a cooldown.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when a command still has a cooldown
      */
-    Message getCooldownMessage(@NotNull CommandContext context, long ms);
+    MessageCreateBuilder getCooldownMessage(@NotNull CommandContext context, long ms);
 
     /**
      * Gets a {@link Message} to send when the channel type isn't suitable for the command.
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when the channel type isn't suitable for the command
      */
-    Message getWrongChannelTypeMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getWrongChannelTypeMessage(@NotNull CommandContext context);
 
     /**
      * Gets a {@link Message} to send when the command execution failed.
      *
      * @param context   the corresponding {@link CommandContext}
      * @param exception the Exception that made the command execution fail
+     *
      * @return a {@link Message} to send when the command execution failed
      */
-    Message getCommandExecutionFailedMessage(@NotNull CommandContext context, @NotNull Exception exception);
+    MessageCreateBuilder getCommandExecutionFailedMessage(@NotNull CommandContext context, @NotNull Exception exception);
 
     /**
      * Gets a {@link Message} to send when a text command gets invoked but the
@@ -105,7 +117,8 @@ public interface ErrorMessageFactory {
      * CommandRegistrationPolicy.MIGRATING}
      *
      * @param context the corresponding {@link CommandContext}
+     *
      * @return a {@link Message} to send when a text command gets invoked
      */
-    Message getSlashCommandMigrationMessage(@NotNull CommandContext context);
+    MessageCreateBuilder getSlashCommandMigrationMessage(@NotNull CommandContext context);
 }

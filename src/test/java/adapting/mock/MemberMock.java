@@ -1,28 +1,35 @@
 package adapting.mock;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
-import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
+import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Formatter;
 import java.util.List;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.ClientType;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.attribute.IPermissionContainer;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("ConstantConditions")
 public class MemberMock implements Member {
 
     private final String name;
     private final long id;
 
-    public MemberMock(String name, long id) {
+    public MemberMock(final String name, final long id) {
         this.name = name;
         this.id = id;
     }
@@ -47,7 +54,7 @@ public class MemberMock implements Member {
 
     @NotNull
     @Override
-    public EnumSet<Permission> getPermissions(@NotNull GuildChannel guildChannel) {
+    public EnumSet<Permission> getPermissions(@NotNull final GuildChannel channel) {
         return null;
     }
 
@@ -59,42 +66,37 @@ public class MemberMock implements Member {
 
     @NotNull
     @Override
-    public EnumSet<Permission> getPermissionsExplicit(@NotNull GuildChannel guildChannel) {
+    public EnumSet<Permission> getPermissionsExplicit(@NotNull final GuildChannel channel) {
         return null;
     }
 
     @Override
-    public boolean hasPermission(@NotNull Permission... permissions) {
+    public boolean hasPermission(@NotNull final Permission... permissions) {
         return false;
     }
 
     @Override
-    public boolean hasPermission(@NotNull Collection<Permission> collection) {
+    public boolean hasPermission(@NotNull final Collection<Permission> collection) {
         return false;
     }
 
     @Override
-    public boolean hasPermission(@NotNull GuildChannel guildChannel, @NotNull Permission... permissions) {
+    public boolean hasPermission(@NotNull final GuildChannel channel, @NotNull final Permission... permissions) {
         return false;
     }
 
     @Override
-    public boolean hasPermission(@NotNull GuildChannel guildChannel, @NotNull Collection<Permission> collection) {
+    public boolean hasPermission(@NotNull final GuildChannel channel, @NotNull final Collection<Permission> permissions) {
         return false;
     }
 
     @Override
-    public boolean hasAccess(@NotNull GuildChannel channel) {
-        return Member.super.hasAccess(channel);
-    }
-
-    @Override
-    public boolean canSync(@NotNull IPermissionContainer iPermissionContainer, @NotNull IPermissionContainer iPermissionContainer1) {
+    public boolean canSync(@NotNull final IPermissionContainer targetChannel, @NotNull final IPermissionContainer syncSource) {
         return false;
     }
 
     @Override
-    public boolean canSync(@NotNull IPermissionContainer iPermissionContainer) {
+    public boolean canSync(@NotNull final IPermissionContainer channel) {
         return false;
     }
 
@@ -152,7 +154,7 @@ public class MemberMock implements Member {
 
     @NotNull
     @Override
-    public OnlineStatus getOnlineStatus(@NotNull ClientType clientType) {
+    public OnlineStatus getOnlineStatus(@NotNull final ClientType clientType) {
         return null;
     }
 
@@ -165,13 +167,13 @@ public class MemberMock implements Member {
     @Nullable
     @Override
     public String getNickname() {
-        return name;
+        return this.name;
     }
 
     @NotNull
     @Override
     public String getEffectiveName() {
-        return name;
+        return this.name;
     }
 
     @Nullable
@@ -210,17 +212,17 @@ public class MemberMock implements Member {
     }
 
     @Override
-    public boolean canInteract(@NotNull Member member) {
+    public boolean canInteract(@NotNull final Member member) {
         return false;
     }
 
     @Override
-    public boolean canInteract(@NotNull Role role) {
+    public boolean canInteract(@NotNull final Role role) {
         return false;
     }
 
     @Override
-    public boolean canInteract(@NotNull RichCustomEmoji richCustomEmoji) {
+    public boolean canInteract(@NotNull final RichCustomEmoji richCustomEmoji) {
         return false;
     }
 
@@ -236,20 +238,8 @@ public class MemberMock implements Member {
 
     @Nullable
     @Override
-    public TextChannel getDefaultChannel() {
+    public DefaultGuildChannelUnion getDefaultChannel() {
         return null;
-    }
-
-    @NotNull
-    @Override
-    public AuditableRestAction<Void> ban(int delDays) {
-        return Member.super.ban(delDays);
-    }
-
-    @NotNull
-    @Override
-    public AuditableRestAction<Void> ban(int delDays, @Nullable String reason) {
-        return Member.super.ban(delDays, reason);
     }
 
     @NotNull
@@ -260,25 +250,25 @@ public class MemberMock implements Member {
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> kick(@Nullable String reason) {
+    public AuditableRestAction<Void> kick(@Nullable final String reason) {
         return Member.super.kick(reason);
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> mute(boolean mute) {
+    public AuditableRestAction<Void> mute(final boolean mute) {
         return Member.super.mute(mute);
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> deafen(boolean deafen) {
+    public AuditableRestAction<Void> deafen(final boolean deafen) {
         return Member.super.deafen(deafen);
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> modifyNickname(@Nullable String nickname) {
+    public AuditableRestAction<Void> modifyNickname(@Nullable final String nickname) {
         return Member.super.modifyNickname(nickname);
     }
 
@@ -289,7 +279,7 @@ public class MemberMock implements Member {
     }
 
     @Override
-    public void formatTo(Formatter formatter, int flags, int width, int precision) {
+    public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
         Member.super.formatTo(formatter, flags, width, precision);
     }
 
@@ -301,7 +291,7 @@ public class MemberMock implements Member {
 
     @Override
     public long getIdLong() {
-        return id;
+        return this.id;
     }
 
     @NotNull

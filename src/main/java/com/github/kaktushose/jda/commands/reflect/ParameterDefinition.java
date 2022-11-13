@@ -9,18 +9,33 @@ import com.github.kaktushose.jda.commands.annotations.interactions.Choices;
 import com.github.kaktushose.jda.commands.annotations.interactions.Param;
 import com.github.kaktushose.jda.commands.dispatching.validation.Validator;
 import com.github.kaktushose.jda.commands.dispatching.validation.ValidatorRegistry;
-import net.dv8tion.jda.api.entities.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.*;
 
 /**
  * Representation of a command parameter.
@@ -38,56 +53,56 @@ public class ParameterDefinition {
 
     private static final Map<Class<?>, Class<?>> TYPE_MAPPINGS = new HashMap<Class<?>, Class<?>>() {
         {
-            put(byte.class, Byte.class);
-            put(short.class, Short.class);
-            put(int.class, Integer.class);
-            put(long.class, Long.class);
-            put(double.class, Double.class);
-            put(float.class, Float.class);
-            put(boolean.class, Boolean.class);
-            put(char.class, Character.class);
+            this.put(byte.class, Byte.class);
+            this.put(short.class, Short.class);
+            this.put(int.class, Integer.class);
+            this.put(long.class, Long.class);
+            this.put(double.class, Double.class);
+            this.put(float.class, Float.class);
+            this.put(boolean.class, Boolean.class);
+            this.put(char.class, Character.class);
         }
     };
 
     private static final Map<Class<?>, OptionType> OPTION_TYPE_MAPPINGS = new HashMap<Class<?>, OptionType>() {
         {
-            put(Byte.class, OptionType.STRING);
-            put(Short.class, OptionType.STRING);
-            put(Integer.class, OptionType.INTEGER);
-            put(Long.class, OptionType.NUMBER);
-            put(Double.class, OptionType.NUMBER);
-            put(Float.class, OptionType.NUMBER);
-            put(Boolean.class, OptionType.BOOLEAN);
-            put(Character.class, OptionType.STRING);
-            put(String.class, OptionType.STRING);
-            put(String[].class, OptionType.STRING);
-            put(User.class, OptionType.USER);
-            put(Member.class, OptionType.USER);
-            put(GuildChannel.class, OptionType.CHANNEL);
-            put(GuildMessageChannel.class, OptionType.CHANNEL);
-            put(ThreadChannel.class, OptionType.CHANNEL);
-            put(TextChannel.class, OptionType.CHANNEL);
-            put(NewsChannel.class, OptionType.CHANNEL);
-            put(AudioChannel.class, OptionType.CHANNEL);
-            put(VoiceChannel.class, OptionType.CHANNEL);
-            put(StageChannel.class, OptionType.CHANNEL);
-            put(Role.class, OptionType.ROLE);
+            this.put(Byte.class, OptionType.STRING);
+            this.put(Short.class, OptionType.STRING);
+            this.put(Integer.class, OptionType.INTEGER);
+            this.put(Long.class, OptionType.NUMBER);
+            this.put(Double.class, OptionType.NUMBER);
+            this.put(Float.class, OptionType.NUMBER);
+            this.put(Boolean.class, OptionType.BOOLEAN);
+            this.put(Character.class, OptionType.STRING);
+            this.put(String.class, OptionType.STRING);
+            this.put(String[].class, OptionType.STRING);
+            this.put(User.class, OptionType.USER);
+            this.put(Member.class, OptionType.USER);
+            this.put(GuildChannel.class, OptionType.CHANNEL);
+            this.put(GuildMessageChannel.class, OptionType.CHANNEL);
+            this.put(ThreadChannel.class, OptionType.CHANNEL);
+            this.put(TextChannel.class, OptionType.CHANNEL);
+            this.put(NewsChannel.class, OptionType.CHANNEL);
+            this.put(AudioChannel.class, OptionType.CHANNEL);
+            this.put(VoiceChannel.class, OptionType.CHANNEL);
+            this.put(StageChannel.class, OptionType.CHANNEL);
+            this.put(Role.class, OptionType.ROLE);
         }
     };
 
     private static final Map<Class<?>, List<ChannelType>> CHANNEL_TYPE_RESTRICTIONS = new HashMap<Class<?>, List<ChannelType>>() {
         {
-            put(GuildMessageChannel.class, Collections.singletonList(ChannelType.TEXT));
-            put(ThreadChannel.class, Arrays.asList(
+            this.put(GuildMessageChannel.class, Collections.singletonList(ChannelType.TEXT));
+            this.put(ThreadChannel.class, Arrays.asList(
                     ChannelType.GUILD_NEWS_THREAD,
                     ChannelType.GUILD_PUBLIC_THREAD,
                     ChannelType.GUILD_PRIVATE_THREAD
             ));
-            put(TextChannel.class, Collections.singletonList(ChannelType.TEXT));
-            put(NewsChannel.class, Collections.singletonList(ChannelType.NEWS));
-            put(AudioChannel.class, Collections.singletonList(ChannelType.VOICE));
-            put(VoiceChannel.class, Collections.singletonList(ChannelType.VOICE));
-            put(StageChannel.class, Collections.singletonList(ChannelType.STAGE));
+            this.put(TextChannel.class, Collections.singletonList(ChannelType.TEXT));
+            this.put(NewsChannel.class, Collections.singletonList(ChannelType.NEWS));
+            this.put(AudioChannel.class, Collections.singletonList(ChannelType.VOICE));
+            this.put(VoiceChannel.class, Collections.singletonList(ChannelType.VOICE));
+            this.put(StageChannel.class, Collections.singletonList(ChannelType.STAGE));
         }
     };
 
@@ -101,15 +116,15 @@ public class ParameterDefinition {
     private final List<Choice> choices;
     private final List<ConstraintDefinition> constraints;
 
-    private ParameterDefinition(@NotNull Class<?> type,
-                                boolean isConcat,
-                                boolean isOptional,
-                                @Nullable String defaultValue,
-                                boolean isPrimitive,
-                                @NotNull String name,
-                                @NotNull String description,
-                                @NotNull List<Choice> choices,
-                                @NotNull List<ConstraintDefinition> constraints) {
+    private ParameterDefinition(@NotNull final Class<?> type,
+                                final boolean isConcat,
+                                final boolean isOptional,
+                                @Nullable final String defaultValue,
+                                final boolean isPrimitive,
+                                @NotNull final String name,
+                                @NotNull final String description,
+                                @NotNull final List<Choice> choices,
+                                @NotNull final List<ConstraintDefinition> constraints) {
         this.type = type;
         this.isConcat = isConcat;
         this.isOptional = isOptional;
@@ -126,10 +141,11 @@ public class ParameterDefinition {
      *
      * @param parameter the {@link Parameter} of the command method
      * @param registry  an instance of the corresponding {@link ValidatorRegistry}
+     *
      * @return a new ParameterDefinition
      */
     @NotNull
-    public static ParameterDefinition build(@NotNull Parameter parameter, @NotNull ValidatorRegistry registry) {
+    public static ParameterDefinition build(@NotNull final Parameter parameter, @NotNull final ValidatorRegistry registry) {
         if (parameter.isVarArgs()) {
             throw new IllegalArgumentException("VarArgs is not supported for parameters!");
         }
@@ -154,9 +170,9 @@ public class ParameterDefinition {
         }
 
         // index constraints
-        List<ConstraintDefinition> constraints = new ArrayList<>();
-        for (Annotation annotation : parameter.getAnnotations()) {
-            Class<?> annotationType = annotation.annotationType();
+        final List<ConstraintDefinition> constraints = new ArrayList<>();
+        for (final Annotation annotation : parameter.getAnnotations()) {
+            final Class<?> annotationType = annotation.annotationType();
             if (!annotationType.isAnnotationPresent(Constraint.class)) {
                 continue;
             }
@@ -164,15 +180,15 @@ public class ParameterDefinition {
             // annotation object is always different, so we cannot cast it. Thus, we need to get the custom error message via reflection
             String message = "";
             try {
-                Method method = annotationType.getDeclaredMethod("message");
+                final Method method = annotationType.getDeclaredMethod("message");
                 message = (String) method.invoke(annotation);
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
+            } catch (final NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {
             }
             if (message.isEmpty()) {
                 message = "Parameter validation failed";
             }
 
-            java.util.Optional<Validator> optional = registry.get(annotationType, parameterType);
+            final java.util.Optional<Validator> optional = registry.get(annotationType, parameterType);
             if (optional.isPresent()) {
                 constraints.add(new ConstraintDefinition(optional.get(), message, annotation));
             }
@@ -182,17 +198,17 @@ public class ParameterDefinition {
         String name = parameter.getName();
         String description = "empty description";
         if (parameter.isAnnotationPresent(Param.class)) {
-            Param param = parameter.getAnnotation(Param.class);
+            final Param param = parameter.getAnnotation(Param.class);
             name = param.name().isEmpty() ? name : param.name();
             description = param.value();
         }
 
-        List<Choice> choices = new ArrayList<>();
+        final List<Choice> choices = new ArrayList<>();
         // Options
         if (parameter.isAnnotationPresent(Choices.class)) {
-            Choices opt = parameter.getAnnotation(Choices.class);
-            for (String option : opt.value()) {
-                String[] parsed = option.split(":", 2);
+            final Choices opt = parameter.getAnnotation(Choices.class);
+            for (final String option : opt.value()) {
+                final String[] parsed = option.split(":", 2);
                 if (parsed.length < 1) {
                     continue;
                 }
@@ -205,7 +221,7 @@ public class ParameterDefinition {
         }
 
         // this value is only used to determine if a default value must be present (primitives cannot be null)
-        boolean usesPrimitives = TYPE_MAPPINGS.containsKey(parameter.getType());
+        final boolean usesPrimitives = TYPE_MAPPINGS.containsKey(parameter.getType());
 
         return new ParameterDefinition(
                 parameterType,
@@ -226,26 +242,26 @@ public class ParameterDefinition {
      * @return the transformed {@link OptionData}
      */
     public OptionData toOptionData() {
-        String name = getName();
+        String name = this.getName();
         name = name.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
-        OptionData optionData = new OptionData(
-                OPTION_TYPE_MAPPINGS.getOrDefault(type, OptionType.STRING),
+        final OptionData optionData = new OptionData(
+                OPTION_TYPE_MAPPINGS.getOrDefault(this.type, OptionType.STRING),
                 name,
-                description,
-                !isOptional
+                this.description,
+                !this.isOptional
         );
 
-        optionData.addChoices(choices);
+        optionData.addChoices(this.choices);
 
-        constraints.stream().filter(constraint ->
+        this.constraints.stream().filter(constraint ->
                 constraint.getAnnotation().getClass().isAssignableFrom(Min.class)
         ).findFirst().ifPresent(constraint -> optionData.setMinValue(((Min) constraint.getAnnotation()).value()));
 
-        constraints.stream().filter(constraint ->
+        this.constraints.stream().filter(constraint ->
                 constraint.getAnnotation().getClass().isAssignableFrom(Max.class)
         ).findFirst().ifPresent(constraint -> optionData.setMaxValue(((Max) constraint.getAnnotation()).value()));
 
-        java.util.Optional.ofNullable(CHANNEL_TYPE_RESTRICTIONS.get(type)).ifPresent(optionData::setChannelTypes);
+        java.util.Optional.ofNullable(CHANNEL_TYPE_RESTRICTIONS.get(this.type)).ifPresent(optionData::setChannelTypes);
 
         return optionData;
     }
@@ -257,7 +273,7 @@ public class ParameterDefinition {
      */
     @NotNull
     public Class<?> getType() {
-        return type;
+        return this.type;
     }
 
     /**
@@ -266,7 +282,7 @@ public class ParameterDefinition {
      * @return {@code true} if the parameter should be concatenated
      */
     public boolean isConcat() {
-        return isConcat;
+        return this.isConcat;
     }
 
     /**
@@ -275,7 +291,7 @@ public class ParameterDefinition {
      * @return {@code true} if the parameter is optional
      */
     public boolean isOptional() {
-        return isOptional;
+        return this.isOptional;
     }
 
     /**
@@ -285,7 +301,7 @@ public class ParameterDefinition {
      */
     @Nullable
     public String getDefaultValue() {
-        return defaultValue;
+        return this.defaultValue;
     }
 
     /**
@@ -294,7 +310,7 @@ public class ParameterDefinition {
      * @return {@code true} if the type of the parameter is a primitive
      */
     public boolean isPrimitive() {
-        return isPrimitive;
+        return this.isPrimitive;
     }
 
     /**
@@ -304,7 +320,7 @@ public class ParameterDefinition {
      */
     @NotNull
     public List<ConstraintDefinition> getConstraints() {
-        return constraints;
+        return this.constraints;
     }
 
     /**
@@ -314,7 +330,7 @@ public class ParameterDefinition {
      */
     @NotNull
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
@@ -324,7 +340,7 @@ public class ParameterDefinition {
      */
     @NotNull
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     /**
@@ -333,19 +349,19 @@ public class ParameterDefinition {
      * @return the parameter choices
      */
     public List<Choice> getChoices() {
-        return choices;
+        return this.choices;
     }
 
     @Override
     public String toString() {
         return "{" +
-                type.getName() +
-                ", isConcat=" + isConcat +
-                ", isOptional=" + isOptional +
-                ", defaultValue='" + defaultValue + '\'' +
-                ", isPrimitive=" + isPrimitive +
-                ", name='" + name + '\'' +
-                ", constraints=" + constraints +
+                this.type.getName() +
+                ", isConcat=" + this.isConcat +
+                ", isOptional=" + this.isOptional +
+                ", defaultValue='" + this.defaultValue + '\'' +
+                ", isPrimitive=" + this.isPrimitive +
+                ", name='" + this.name + '\'' +
+                ", constraints=" + this.constraints +
                 '}';
     }
 }

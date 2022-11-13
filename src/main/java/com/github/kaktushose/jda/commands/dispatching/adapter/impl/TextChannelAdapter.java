@@ -2,12 +2,11 @@ package com.github.kaktushose.jda.commands.dispatching.adapter.impl;
 
 import com.github.kaktushose.jda.commands.dispatching.CommandContext;
 import com.github.kaktushose.jda.commands.dispatching.adapter.TypeAdapter;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Optional;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Type adapter for JDAs {@link TextChannel}.
@@ -23,18 +22,19 @@ public class TextChannelAdapter implements TypeAdapter<TextChannel> {
      *
      * @param raw     the String to parse
      * @param context the {@link CommandContext}
+     *
      * @return the parsed {@link TextChannel} or an empty Optional if the parsing fails
      */
     @Override
-    public Optional<TextChannel> parse(@NotNull String raw, @NotNull CommandContext context) {
+    public Optional<TextChannel> parse(@NotNull String raw, @NotNull final CommandContext context) {
         if (!context.getEvent().isFromType(ChannelType.TEXT)) {
             return Optional.empty();
         }
 
-        TextChannel textChannel;
-        raw = sanitizeMention(raw);
+        final TextChannel textChannel;
+        raw = this.sanitizeMention(raw);
 
-        Guild guild = context.getEvent().getGuild();
+        final Guild guild = context.getEvent().getGuild();
         if (raw.matches("\\d+")) {
             textChannel = guild.getTextChannelById(raw);
         } else {

@@ -4,17 +4,17 @@ import com.github.kaktushose.jda.commands.JDACommands;
 import com.github.kaktushose.jda.commands.reflect.CommandDefinition;
 import com.github.kaktushose.jda.commands.reflect.ImplementationRegistry;
 import com.github.kaktushose.jda.commands.settings.GuildSettings;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class models a command execution. The
@@ -36,21 +36,21 @@ public class CommandContext {
     private CommandDefinition command;
     private List<CommandDefinition> possibleCommands;
     private List<Object> arguments;
-    private Message errorMessage;
+    private MessageCreateBuilder errorMessage;
     private GuildSettings settings;
     private ImplementationRegistry registry;
     private JDACommands jdaCommands;
     private boolean isHelpEvent;
     private boolean cancelled;
 
-    private CommandContext(GenericEvent event, JDACommands jdaCommands,
-                           GuildSettings settings,
-                           ImplementationRegistry registry,
-                           SlashCommandInteractionEvent interactionEvent) {
-        input = new String[0];
-        options = new ArrayList<>();
-        possibleCommands = new ArrayList<>();
-        arguments = new ArrayList<>();
+    private CommandContext(final GenericEvent event, final JDACommands jdaCommands,
+                           final GuildSettings settings,
+                           final ImplementationRegistry registry,
+                           final SlashCommandInteractionEvent interactionEvent) {
+        this.input = new String[0];
+        this.options = new ArrayList<>();
+        this.possibleCommands = new ArrayList<>();
+        this.arguments = new ArrayList<>();
         this.event = event;
         this.jdaCommands = jdaCommands;
         this.settings = settings;
@@ -66,10 +66,10 @@ public class CommandContext {
      * @param settings    the corresponding {@link GuildSettings}
      * @param registry    the corresponding {@link ImplementationRegistry}
      */
-    public CommandContext(@NotNull SlashCommandInteractionEvent event,
-                          @NotNull JDACommands jdaCommands,
-                          @NotNull GuildSettings settings,
-                          @NotNull ImplementationRegistry registry) {
+    public CommandContext(@NotNull final SlashCommandInteractionEvent event,
+                          @NotNull final JDACommands jdaCommands,
+                          @NotNull final GuildSettings settings,
+                          @NotNull final ImplementationRegistry registry) {
         this(GenericEvent.fromEvent(event), jdaCommands, settings, registry, event);
     }
 
@@ -81,10 +81,10 @@ public class CommandContext {
      * @param settings    the corresponding {@link GuildSettings}
      * @param registry    the corresponding {@link ImplementationRegistry}
      */
-    public CommandContext(@NotNull MessageReceivedEvent event,
-                          @NotNull JDACommands jdaCommands,
-                          @NotNull GuildSettings settings,
-                          @NotNull ImplementationRegistry registry) {
+    public CommandContext(@NotNull final MessageReceivedEvent event,
+                          @NotNull final JDACommands jdaCommands,
+                          @NotNull final GuildSettings settings,
+                          @NotNull final ImplementationRegistry registry) {
         this(GenericEvent.fromEvent(event), jdaCommands, settings, registry, null);
     }
 
@@ -94,21 +94,23 @@ public class CommandContext {
      * FilterPosition.BEFORE_ROUTING} if {@link #isSlash} returns {@code true}.
      *
      * @return the raw user input
+     *
      * @see #getOptions()
      */
     @NotNull
     public String[] getInput() {
-        return input;
+        return this.input;
     }
 
     /**
      * Set the user input.
      *
      * @param input the user input
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setInput(@NotNull String[] input) {
+    public CommandContext setInput(@NotNull final String[] input) {
         this.input = input;
         return this;
     }
@@ -117,11 +119,25 @@ public class CommandContext {
      * Gets the {@link OptionMapping OptionMappings}. Will be empty if {@link #isSlash} returns {@code false}.
      *
      * @return the {@link OptionMapping OptionMappings}
+     *
      * @see #getInput()
      */
     @NotNull
     public List<OptionMapping> getOptions() {
-        return options;
+        return this.options;
+    }
+
+    /**
+     * Set the {@link OptionMapping OptionMappings}.
+     *
+     * @param options the {@link OptionMapping OptionMappings}
+     *
+     * @return the current CommandContext instance
+     */
+    @NotNull
+    public CommandContext setOptions(@NotNull final List<OptionMapping> options) {
+        this.options = options;
+        return this;
     }
 
     /**
@@ -129,25 +145,14 @@ public class CommandContext {
      * Will be empty if {@link #isSlash} returns {@code false}.
      *
      * @return the {@link OptionMapping OptionMappings}
+     *
      * @see #getInput()
      */
     @NotNull
     public Map<String, OptionMapping> getOptionsAsMap() {
-        Map<String, OptionMapping> result = new HashMap<>();
-        options.forEach(option -> result.put(option.getName(), option));
+        final Map<String, OptionMapping> result = new HashMap<>();
+        this.options.forEach(option -> result.put(option.getName(), option));
         return result;
-    }
-
-    /**
-     * Set the {@link OptionMapping OptionMappings}.
-     *
-     * @param options the {@link OptionMapping OptionMappings}
-     * @return the current CommandContext instance
-     */
-    @NotNull
-    public CommandContext setOptions(@NotNull List<OptionMapping> options) {
-        this.options = options;
-        return this;
     }
 
     /**
@@ -157,17 +162,18 @@ public class CommandContext {
      */
     @NotNull
     public GenericEvent getEvent() {
-        return event;
+        return this.event;
     }
 
     /**
      * Set the {@link MessageReceivedEvent}.
      *
      * @param event the {@link MessageReceivedEvent}
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setEvent(@NotNull MessageReceivedEvent event) {
+    public CommandContext setEvent(@NotNull final MessageReceivedEvent event) {
         this.event = GenericEvent.fromEvent(event);
         return this;
     }
@@ -176,10 +182,11 @@ public class CommandContext {
      * Set the {@link SlashCommandInteractionEvent}.
      *
      * @param event the {@link SlashCommandInteractionEvent}
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setEvent(@NotNull SlashCommandInteractionEvent event) {
+    public CommandContext setEvent(@NotNull final SlashCommandInteractionEvent event) {
         this.event = GenericEvent.fromEvent(event);
         return this;
     }
@@ -191,17 +198,18 @@ public class CommandContext {
      */
     @Nullable
     public CommandDefinition getCommand() {
-        return command;
+        return this.command;
     }
 
     /**
      * Set the {@link CommandDefinition}.
      *
      * @param command the {@link CommandDefinition}
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setCommand(@Nullable CommandDefinition command) {
+    public CommandContext setCommand(@Nullable final CommandDefinition command) {
         this.command = command;
         return this;
     }
@@ -215,17 +223,18 @@ public class CommandContext {
      */
     @NotNull
     public List<CommandDefinition> getPossibleCommands() {
-        return possibleCommands == null ? new ArrayList<>() : possibleCommands;
+        return this.possibleCommands == null ? new ArrayList<>() : this.possibleCommands;
     }
 
     /**
      * Sets the list of {@link CommandDefinition CommandDefinitions} that match the input.
      *
      * @param possibleCommands a list of {@link CommandDefinition CommandDefinitions} that match the input
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setPossibleCommands(@NotNull List<CommandDefinition> possibleCommands) {
+    public CommandContext setPossibleCommands(@NotNull final List<CommandDefinition> possibleCommands) {
         this.possibleCommands = possibleCommands;
         return this;
     }
@@ -237,17 +246,18 @@ public class CommandContext {
      */
     @NotNull
     public List<Object> getArguments() {
-        return arguments;
+        return this.arguments;
     }
 
     /**
      * Set the arguments.
      *
      * @param arguments the parsed arguments
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setArguments(@NotNull List<Object> arguments) {
+    public CommandContext setArguments(@NotNull final List<Object> arguments) {
         this.arguments = arguments;
         return this;
     }
@@ -258,18 +268,19 @@ public class CommandContext {
      * @return {@link Message} to send
      */
     @Nullable
-    public Message getErrorMessage() {
-        return errorMessage;
+    public MessageCreateBuilder getErrorMessage() {
+        return this.errorMessage;
     }
 
     /**
      * Set the the {@link Message} to send if an error occurred.
      *
      * @param message the {@link Message} to send
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setErrorMessage(@NotNull Message message) {
+    public CommandContext setErrorMessage(@NotNull final MessageCreateBuilder message) {
         this.errorMessage = message;
         return this;
     }
@@ -281,17 +292,18 @@ public class CommandContext {
      */
     @NotNull
     public GuildSettings getSettings() {
-        return settings;
+        return this.settings;
     }
 
     /**
      * Set the {@link GuildSettings}.
      *
      * @param settings the {@link GuildSettings}
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setSettings(@NotNull GuildSettings settings) {
+    public CommandContext setSettings(@NotNull final GuildSettings settings) {
         this.settings = settings;
         return this;
     }
@@ -303,17 +315,18 @@ public class CommandContext {
      */
     @NotNull
     public ImplementationRegistry getImplementationRegistry() {
-        return registry;
+        return this.registry;
     }
 
     /**
      * Set the {@link ImplementationRegistry} instance.
      *
      * @param registry the {@link ImplementationRegistry} instance
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setImplementationRegistry(@NotNull ImplementationRegistry registry) {
+    public CommandContext setImplementationRegistry(@NotNull final ImplementationRegistry registry) {
         this.registry = registry;
         return this;
     }
@@ -325,17 +338,18 @@ public class CommandContext {
      */
     @NotNull
     public JDACommands getJdaCommands() {
-        return jdaCommands;
+        return this.jdaCommands;
     }
 
     /**
      * Set the {@link JDACommands} instance.
      *
      * @param jdaCommands the {@link JDACommands} instance
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setJdaCommands(@NotNull JDACommands jdaCommands) {
+    public CommandContext setJdaCommands(@NotNull final JDACommands jdaCommands) {
         this.jdaCommands = jdaCommands;
         return this;
     }
@@ -346,18 +360,19 @@ public class CommandContext {
      * @return {@code true} if the context represents a help event
      */
     public boolean isHelpEvent() {
-        return isHelpEvent;
+        return this.isHelpEvent;
     }
 
     /**
      * Set whether the context represents a help event.
      *
      * @param helpEvent whether the context represents a help event
+     *
      * @return the current CommandContext instance
      */
     @NotNull
-    public CommandContext setHelpEvent(boolean helpEvent) {
-        isHelpEvent = helpEvent;
+    public CommandContext setHelpEvent(final boolean helpEvent) {
+        this.isHelpEvent = helpEvent;
         return this;
     }
 
@@ -367,13 +382,14 @@ public class CommandContext {
      * @return {@code true} if the context should be cancelled
      */
     public boolean isCancelled() {
-        return cancelled;
+        return this.cancelled;
     }
 
     /**
      * Set whether the context should be cancelled.
      *
      * @param cancelled whether the context should be cancelled
+     *
      * @return the current CommandContext instance
      */
     @NotNull
@@ -388,18 +404,19 @@ public class CommandContext {
      * @return {@code true} if the context was created from a slash command
      */
     public boolean isSlash() {
-        return interactionEvent != null;
+        return this.interactionEvent != null;
     }
 
     /**
      * Gets the possibly-null {@link SlashCommandInteractionEvent}.
      *
      * @return possibly-null {@link SlashCommandInteractionEvent}
+     *
      * @see #isSlash()
      */
     @Nullable
     public SlashCommandInteractionEvent getInteractionEvent() {
-        return interactionEvent;
+        return this.interactionEvent;
     }
 
     /**
@@ -409,7 +426,7 @@ public class CommandContext {
      * @return the contextual prefix
      */
     public String getContextualPrefix() {
-        return isSlash() ? "/" : settings.getPrefix();
+        return this.isSlash() ? "/" : this.settings.getPrefix();
     }
 
 }

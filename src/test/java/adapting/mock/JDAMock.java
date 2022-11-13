@@ -1,9 +1,32 @@
 package adapting.mock;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.ApplicationInfo;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.ScheduledEvent;
+import net.dv8tion.jda.api.entities.SelfUser;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.StickerPack;
 import net.dv8tion.jda.api.entities.sticker.StickerSnowflake;
@@ -19,6 +42,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.requests.restaction.CommandEditAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -31,27 +55,27 @@ import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-
-@SuppressWarnings("ConstantConditions")
 public class JDAMock implements JDA {
 
     public static final User USER = new UserMock("user", 0);
 
-    @NotNull
     @Override
-    public RestAction<User> retrieveUserById(@NotNull String id) {
+    public CacheRestAction<User> retrieveUserById(@NotNull final String id) {
         if (id.equals(USER.getId())) {
-            return new RestActionMock<>(USER);
+            return new CacheRestActionMock<>(USER);
         }
         throw ErrorResponseException.create(ErrorResponse.UNKNOWN_USER, new Response(new IllegalArgumentException(), new HashSet<>()));
     }
 
     @NotNull
     @Override
-    public List<User> getUsersByName(@NotNull String name, boolean ignoreCase) {
+    public CacheRestAction<User> retrieveUserById(final long id) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public List<User> getUsersByName(@NotNull String name, final boolean ignoreCase) {
         String username = USER.getName();
         if (ignoreCase) {
             username = username.toUpperCase();
@@ -59,7 +83,7 @@ public class JDAMock implements JDA {
         }
         if (name.equals(username)) {
             return new ArrayList<User>() {{
-                add(USER);
+                this.add(USER);
             }};
         }
         return new ArrayList<>();
@@ -84,7 +108,7 @@ public class JDAMock implements JDA {
     }
 
     @Override
-    public boolean unloadUser(long l) {
+    public boolean unloadUser(final long l) {
         return false;
     }
 
@@ -95,7 +119,7 @@ public class JDAMock implements JDA {
 
     @NotNull
     @Override
-    public JDA awaitStatus(@NotNull JDA.Status status, @NotNull Status... statuses) throws InterruptedException {
+    public JDA awaitStatus(@NotNull final JDA.Status status, @NotNull final Status... statuses) throws InterruptedException {
         return null;
     }
 
@@ -135,12 +159,12 @@ public class JDAMock implements JDA {
     }
 
     @Override
-    public void addEventListener(@NotNull Object... objects) {
+    public void addEventListener(@NotNull final Object... objects) {
 
     }
 
     @Override
-    public void removeEventListener(@NotNull Object... objects) {
+    public void removeEventListener(@NotNull final Object... objects) {
 
     }
 
@@ -158,13 +182,19 @@ public class JDAMock implements JDA {
 
     @NotNull
     @Override
-    public RestAction<Command> retrieveCommandById(@NotNull String s) {
+    public RestAction<List<Command>> retrieveCommands(final boolean withLocalizations) {
         return null;
     }
 
     @NotNull
     @Override
-    public CommandCreateAction upsertCommand(@NotNull CommandData commandData) {
+    public RestAction<Command> retrieveCommandById(@NotNull final String s) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public CommandCreateAction upsertCommand(@NotNull final CommandData commandData) {
         return null;
     }
 
@@ -176,25 +206,25 @@ public class JDAMock implements JDA {
 
     @NotNull
     @Override
-    public CommandEditAction editCommandById(@NotNull String s) {
+    public CommandEditAction editCommandById(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> deleteCommandById(@NotNull String s) {
+    public RestAction<Void> deleteCommandById(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public GuildAction createGuild(@NotNull String s) {
+    public GuildAction createGuild(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> createGuildFromTemplate(@NotNull String s, @NotNull String s1, @Nullable Icon icon) {
+    public RestAction<Void> createGuildFromTemplate(@NotNull final String s, @NotNull final String s1, @Nullable final Icon icon) {
         return null;
     }
 
@@ -212,19 +242,13 @@ public class JDAMock implements JDA {
 
     @NotNull
     @Override
-    public List<Guild> getMutualGuilds(@NotNull User... users) {
+    public List<Guild> getMutualGuilds(@NotNull final User... users) {
         return null;
     }
 
     @NotNull
     @Override
-    public List<Guild> getMutualGuilds(@NotNull Collection<User> collection) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public RestAction<User> retrieveUserById(long l, boolean b) {
+    public List<Guild> getMutualGuilds(@NotNull final Collection<User> collection) {
         return null;
     }
 
@@ -241,13 +265,166 @@ public class JDAMock implements JDA {
     }
 
     @Override
-    public boolean isUnavailable(long l) {
+    public boolean isUnavailable(final long l) {
         return false;
     }
 
     @NotNull
     @Override
     public SnowflakeCacheView<Role> getRoleCache() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public SnowflakeCacheView<ScheduledEvent> getScheduledEventCache() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public SnowflakeCacheView<PrivateChannel> getPrivateChannelCache() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public CacheRestAction<PrivateChannel> openPrivateChannelById(final long userId) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public SnowflakeCacheView<RichCustomEmoji> getEmojiCache() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public RestAction<StickerUnion> retrieveSticker(@NotNull final StickerSnowflake stickerSnowflake) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public RestAction<List<StickerPack>> retrieveNitroStickerPacks() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public IEventManager getEventManager() {
+        return null;
+    }
+
+    @Override
+    public void setEventManager(@Nullable final IEventManager iEventManager) {
+
+    }
+
+    @NotNull
+    @Override
+    public SelfUser getSelfUser() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public Presence getPresence() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ShardInfo getShardInfo() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public String getToken() {
+        return null;
+    }
+
+    @Override
+    public long getResponseTotal() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxReconnectDelay() {
+        return 0;
+    }
+
+    @Override
+    public void setRequestTimeoutRetry(final boolean b) {
+
+    }
+
+    @Override
+    public boolean isAutoReconnect() {
+        return false;
+    }
+
+    @Override
+    public void setAutoReconnect(final boolean b) {
+
+    }
+
+    @Override
+    public boolean isBulkDeleteSplittingEnabled() {
+        return false;
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    @Override
+    public void shutdownNow() {
+
+    }
+
+    @NotNull
+    @Override
+    public AccountType getAccountType() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public RestAction<ApplicationInfo> retrieveApplicationInfo() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public JDA setRequiredScopes(@NotNull final Collection<String> collection) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public String getInviteUrl(@Nullable final Permission... permissions) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public String getInviteUrl(@Nullable final Collection<Permission> collection) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public ShardManager getShardManager() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public RestAction<Webhook> retrieveWebhookById(@NotNull final String s) {
         return null;
     }
 
@@ -289,148 +466,7 @@ public class JDAMock implements JDA {
 
     @NotNull
     @Override
-    public SnowflakeCacheView<PrivateChannel> getPrivateChannelCache() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public RestAction<PrivateChannel> openPrivateChannelById(long l) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public SnowflakeCacheView<RichCustomEmoji> getEmojiCache() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public RestAction<StickerUnion> retrieveSticker(@NotNull StickerSnowflake stickerSnowflake) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public RestAction<List<StickerPack>> retrieveNitroStickerPacks() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public IEventManager getEventManager() {
-        return null;
-    }
-
-    @Override
-    public void setEventManager(@Nullable IEventManager iEventManager) {
-
-    }
-
-    @NotNull
-    @Override
-    public SelfUser getSelfUser() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public Presence getPresence() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public ShardInfo getShardInfo() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public String getToken() {
-        return null;
-    }
-
-    @Override
-    public long getResponseTotal() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxReconnectDelay() {
-        return 0;
-    }
-
-    @Override
-    public void setRequestTimeoutRetry(boolean b) {
-
-    }
-
-    @Override
-    public boolean isAutoReconnect() {
-        return false;
-    }
-
-    @Override
-    public void setAutoReconnect(boolean b) {
-
-    }
-
-    @Override
-    public boolean isBulkDeleteSplittingEnabled() {
-        return false;
-    }
-
-    @Override
-    public void shutdown() {
-
-    }
-
-    @Override
-    public void shutdownNow() {
-
-    }
-
-    @NotNull
-    @Override
-    public AccountType getAccountType() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public RestAction<ApplicationInfo> retrieveApplicationInfo() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public JDA setRequiredScopes(@NotNull Collection<String> collection) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public String getInviteUrl(@Nullable Permission... permissions) {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public String getInviteUrl(@Nullable Collection<Permission> collection) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public ShardManager getShardManager() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public RestAction<Webhook> retrieveWebhookById(@NotNull String s) {
+    public SnowflakeCacheView<ForumChannel> getForumChannelCache() {
         return null;
     }
 }

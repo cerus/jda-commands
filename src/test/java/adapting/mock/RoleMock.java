@@ -1,25 +1,27 @@
 package adapting.mock;
 
+import java.awt.Color;
+import java.util.Collection;
+import java.util.EnumSet;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.RoleIcon;
+import net.dv8tion.jda.api.entities.channel.attribute.IPermissionContainer;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.managers.RoleManager;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.RoleAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-import java.util.Collection;
-import java.util.EnumSet;
-
-@SuppressWarnings("ConstantConditions")
 public class RoleMock implements Role {
 
     private final String name;
     private final long id;
 
-    public RoleMock(String name, long id) {
+    public RoleMock(final String name, final long id) {
         this.name = name;
         this.id = id;
     }
@@ -37,7 +39,7 @@ public class RoleMock implements Role {
     @NotNull
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
@@ -77,7 +79,7 @@ public class RoleMock implements Role {
     }
 
     @Override
-    public boolean canInteract(@NotNull Role role) {
+    public boolean canInteract(@NotNull final Role role) {
         return false;
     }
 
@@ -95,7 +97,7 @@ public class RoleMock implements Role {
 
     @NotNull
     @Override
-    public EnumSet<Permission> getPermissions(@NotNull GuildChannel guildChannel) {
+    public EnumSet<Permission> getPermissions(@NotNull final GuildChannel guildChannel) {
         return null;
     }
 
@@ -107,43 +109,43 @@ public class RoleMock implements Role {
 
     @NotNull
     @Override
-    public EnumSet<Permission> getPermissionsExplicit(@NotNull GuildChannel guildChannel) {
+    public EnumSet<Permission> getPermissionsExplicit(@NotNull final GuildChannel guildChannel) {
         return null;
     }
 
     @Override
-    public boolean hasPermission(@NotNull Permission... permissions) {
+    public boolean hasPermission(@NotNull final Permission... permissions) {
         return false;
     }
 
     @Override
-    public boolean hasPermission(@NotNull Collection<Permission> collection) {
+    public boolean hasPermission(@NotNull final Collection<Permission> collection) {
         return false;
     }
 
     @Override
-    public boolean hasPermission(@NotNull GuildChannel guildChannel, @NotNull Permission... permissions) {
+    public boolean hasPermission(@NotNull final GuildChannel guildChannel, @NotNull final Permission... permissions) {
         return false;
     }
 
     @Override
-    public boolean hasPermission(@NotNull GuildChannel guildChannel, @NotNull Collection<Permission> collection) {
+    public boolean hasPermission(@NotNull final GuildChannel guildChannel, @NotNull final Collection<Permission> collection) {
         return false;
     }
 
     @Override
-    public boolean canSync(@NotNull IPermissionContainer iPermissionContainer, @NotNull IPermissionContainer iPermissionContainer1) {
+    public boolean canSync(@NotNull final IPermissionContainer iPermissionContainer, @NotNull final IPermissionContainer iPermissionContainer1) {
         return false;
     }
 
     @Override
-    public boolean canSync(@NotNull IPermissionContainer iPermissionContainer) {
+    public boolean canSync(@NotNull final IPermissionContainer iPermissionContainer) {
         return false;
     }
 
     @NotNull
     @Override
-    public RoleAction createCopy(@NotNull Guild guild) {
+    public RoleAction createCopy(@NotNull final Guild guild) {
         return null;
     }
 
@@ -178,7 +180,7 @@ public class RoleMock implements Role {
     }
 
     @Override
-    public int compareTo(@NotNull Role o) {
+    public int compareTo(@NotNull final Role o) {
         return 0;
     }
 
@@ -190,6 +192,6 @@ public class RoleMock implements Role {
 
     @Override
     public long getIdLong() {
-        return id;
+        return this.id;
     }
 }

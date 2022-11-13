@@ -6,17 +6,15 @@ import com.github.kaktushose.jda.commands.embeds.EmbedDTO;
 import com.github.kaktushose.jda.commands.reflect.CommandDefinition;
 import com.github.kaktushose.jda.commands.reflect.ConstraintDefinition;
 import com.github.kaktushose.jda.commands.settings.GuildSettings;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Subtype of {@link DefaultErrorMessageFactory} that can load the embeds from an {@link EmbedCache}.
@@ -31,29 +29,29 @@ public class JsonErrorMessageFactory extends DefaultErrorMessageFactory {
 
     private final EmbedCache embedCache;
 
-    public JsonErrorMessageFactory(EmbedCache embedCache) {
+    public JsonErrorMessageFactory(final EmbedCache embedCache) {
         this.embedCache = embedCache;
     }
 
     @Override
-    public Message getCommandNotFoundMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("commandNotFound")) {
+    public MessageCreateBuilder getCommandNotFoundMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("commandNotFound")) {
             return super.getCommandNotFoundMessage(context);
         }
 
-        GuildSettings settings = context.getSettings();
+        final GuildSettings settings = context.getSettings();
 
-        EmbedDTO embedDTO = embedCache.getEmbed("commandNotFound")
+        final EmbedDTO embedDTO = this.embedCache.getEmbed("commandNotFound")
                 .injectValue("prefix", settings.getPrefix())
                 .injectValue("helpLabel", settings.getHelpLabels().stream().findFirst().orElse("help"));
-        MessageEmbed embed;
+        final MessageEmbed embed;
 
         if (context.getPossibleCommands().isEmpty()) {
-            EmbedBuilder builder = embedDTO.toEmbedBuilder();
+            final EmbedBuilder builder = embedDTO.toEmbedBuilder();
             builder.getFields().removeIf(field -> "{commands}".equals(field.getValue()));
             embed = builder.build();
         } else {
-            StringBuilder sbPossible = new StringBuilder();
+            final StringBuilder sbPossible = new StringBuilder();
             context.getPossibleCommands().forEach(command ->
                     sbPossible.append(String.format("`%s`", command.getLabels().get(0))).append(", ")
             );
@@ -61,22 +59,22 @@ public class JsonErrorMessageFactory extends DefaultErrorMessageFactory {
             embed = embedDTO.toMessageEmbed();
         }
 
-        return new MessageBuilder().setEmbeds(embed).build();
+        return new MessageCreateBuilder().setEmbeds(embed);
     }
 
     @Override
-    public Message getInsufficientPermissionsMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("insufficientPermissions")) {
+    public MessageCreateBuilder getInsufficientPermissionsMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("insufficientPermissions")) {
             return super.getInsufficientPermissionsMessage(context);
         }
 
-        GuildSettings settings = context.getSettings();
-        CommandDefinition command = context.getCommand();
-        StringBuilder sbPermissions = new StringBuilder();
+        final GuildSettings settings = context.getSettings();
+        final CommandDefinition command = context.getCommand();
+        final StringBuilder sbPermissions = new StringBuilder();
         command.getPermissions().forEach(permission -> sbPermissions.append(permission).append(", "));
-        String permissions = sbPermissions.toString().isEmpty() ? "N/A" : sbPermissions.substring(0, sbPermissions.length() - 2);
+        final String permissions = sbPermissions.toString().isEmpty() ? "N/A" : sbPermissions.substring(0, sbPermissions.length() - 2);
 
-        return embedCache.getEmbed("insufficientPermissions")
+        return this.embedCache.getEmbed("insufficientPermissions")
                 .injectValue("prefix", settings.getPrefix())
                 .injectValue("label", command.getLabels().get(0))
                 .injectValue("permissions", permissions)
@@ -84,38 +82,38 @@ public class JsonErrorMessageFactory extends DefaultErrorMessageFactory {
     }
 
     @Override
-    public Message getGuildMutedMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("guildMuted")) {
+    public MessageCreateBuilder getGuildMutedMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("guildMuted")) {
             return super.getGuildMutedMessage(context);
         }
-        return embedCache.getEmbed("guildMuted").toMessage();
+        return this.embedCache.getEmbed("guildMuted").toMessage();
     }
 
     @Override
-    public Message getChannelMutedMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("channelMuted")) {
+    public MessageCreateBuilder getChannelMutedMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("channelMuted")) {
             return super.getChannelMutedMessage(context);
         }
-        return embedCache.getEmbed("channelMuted").toMessage();
+        return this.embedCache.getEmbed("channelMuted").toMessage();
     }
 
     @Override
-    public Message getUserMutedMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("userMuted")) {
+    public MessageCreateBuilder getUserMutedMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("userMuted")) {
             return super.getUserMutedMessage(context);
         }
-        return embedCache.getEmbed("userMuted").toMessage();
+        return this.embedCache.getEmbed("userMuted").toMessage();
     }
 
 
     @Override
-    public Message getSyntaxErrorMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("syntaxError")) {
+    public MessageCreateBuilder getSyntaxErrorMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("syntaxError")) {
             return super.getSyntaxErrorMessage(context);
         }
-        StringBuilder sbExpected = new StringBuilder();
-        CommandDefinition command = Objects.requireNonNull(context.getCommand());
-        List<String> arguments = Arrays.asList(context.getInput());
+        final StringBuilder sbExpected = new StringBuilder();
+        final CommandDefinition command = Objects.requireNonNull(context.getCommand());
+        final List<String> arguments = Arrays.asList(context.getInput());
 
         command.getActualParameters().forEach(parameter -> {
 
@@ -125,13 +123,13 @@ public class JsonErrorMessageFactory extends DefaultErrorMessageFactory {
             }
             sbExpected.append(typeName).append(", ");
         });
-        String expected = sbExpected.toString().isEmpty() ? " " : sbExpected.substring(0, sbExpected.length() - 2);
+        final String expected = sbExpected.toString().isEmpty() ? " " : sbExpected.substring(0, sbExpected.length() - 2);
 
-        StringBuilder sbActual = new StringBuilder();
+        final StringBuilder sbActual = new StringBuilder();
         arguments.forEach(argument -> sbActual.append(argument).append(", "));
-        String actual = sbActual.toString().isEmpty() ? " " : sbActual.substring(0, sbActual.length() - 2);
+        final String actual = sbActual.toString().isEmpty() ? " " : sbActual.substring(0, sbActual.length() - 2);
 
-        return embedCache.getEmbed("syntaxError")
+        return this.embedCache.getEmbed("syntaxError")
                 .injectValue("usage", command.getMetadata().getUsage().replaceAll("\\{prefix}",
                         Matcher.quoteReplacement(context.getSettings().getPrefix()))
                 )
@@ -141,54 +139,54 @@ public class JsonErrorMessageFactory extends DefaultErrorMessageFactory {
     }
 
     @Override
-    public Message getConstraintFailedMessage(@NotNull CommandContext context, @NotNull ConstraintDefinition constraint) {
-        if (!embedCache.containsEmbed("constraintFailed")) {
+    public MessageCreateBuilder getConstraintFailedMessage(@NotNull final CommandContext context, @NotNull final ConstraintDefinition constraint) {
+        if (!this.embedCache.containsEmbed("constraintFailed")) {
             return super.getConstraintFailedMessage(context, constraint);
         }
-        return embedCache.getEmbed("constraintFailed")
+        return this.embedCache.getEmbed("constraintFailed")
                 .injectValue("message", constraint.getMessage())
                 .toMessage();
     }
 
     @Override
-    public Message getCooldownMessage(@NotNull CommandContext context, long ms) {
-        if (!embedCache.containsEmbed("cooldown")) {
+    public MessageCreateBuilder getCooldownMessage(@NotNull final CommandContext context, final long ms) {
+        if (!this.embedCache.containsEmbed("cooldown")) {
             return super.getCooldownMessage(context, ms);
         }
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
-        long s = seconds % 60;
-        long m = (seconds / 60) % 60;
-        long h = (seconds / (60 * 60)) % 24;
-        String cooldown = String.format("%d:%02d:%02d", h, m, s);
+        final long seconds = TimeUnit.MILLISECONDS.toSeconds(ms);
+        final long s = seconds % 60;
+        final long m = (seconds / 60) % 60;
+        final long h = (seconds / (60 * 60)) % 24;
+        final String cooldown = String.format("%d:%02d:%02d", h, m, s);
 
-        return embedCache.getEmbed("cooldown")
+        return this.embedCache.getEmbed("cooldown")
                 .injectValue("cooldown", cooldown)
                 .toMessage();
     }
 
     @Override
-    public Message getWrongChannelTypeMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("wrongChannel")) {
+    public MessageCreateBuilder getWrongChannelTypeMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("wrongChannel")) {
             return super.getInsufficientPermissionsMessage(context);
         }
-        return embedCache.getEmbed("wrongChannel").toMessage();
+        return this.embedCache.getEmbed("wrongChannel").toMessage();
     }
 
     @Override
-    public Message getCommandExecutionFailedMessage(@NotNull CommandContext context, @NotNull Exception exception) {
-        if (!embedCache.containsEmbed("executionFailed")) {
+    public MessageCreateBuilder getCommandExecutionFailedMessage(@NotNull final CommandContext context, @NotNull final Exception exception) {
+        if (!this.embedCache.containsEmbed("executionFailed")) {
             return super.getCommandExecutionFailedMessage(context, exception);
         }
-        return embedCache.getEmbed("executionFailed")
+        return this.embedCache.getEmbed("executionFailed")
                 .injectValue("exception", exception.toString())
                 .toMessage();
     }
 
     @Override
-    public Message getSlashCommandMigrationMessage(@NotNull CommandContext context) {
-        if (!embedCache.containsEmbed("migration")) {
+    public MessageCreateBuilder getSlashCommandMigrationMessage(@NotNull final CommandContext context) {
+        if (!this.embedCache.containsEmbed("migration")) {
             return super.getInsufficientPermissionsMessage(context);
         }
-        return embedCache.getEmbed("migration").toMessage();
+        return this.embedCache.getEmbed("migration").toMessage();
     }
 }

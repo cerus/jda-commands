@@ -3,7 +3,7 @@ package com.github.kaktushose.jda.commands.dispatching.filter.impl;
 import com.github.kaktushose.jda.commands.annotations.Command;
 import com.github.kaktushose.jda.commands.dispatching.CommandContext;
 import com.github.kaktushose.jda.commands.dispatching.filter.Filter;
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class DirectMessageFilter implements Filter {
      * @param context the {@link CommandContext} to filter
      */
     @Override
-    public void apply(@NotNull CommandContext context) {
+    public void apply(@NotNull final CommandContext context) {
         if (context.getEvent().isFromType(ChannelType.PRIVATE) && !context.getCommand().isDM()) {
             log.debug("Received private message but command cannot be executed in DMs!");
             context.setCancelled(true);

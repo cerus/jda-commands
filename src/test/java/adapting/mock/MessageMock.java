@@ -1,25 +1,41 @@
 package adapting.mock;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Formatter;
+import java.util.List;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Mentions;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageActivity;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.MessageReference;
+import net.dv8tion.jda.api.entities.MessageType;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.unions.GuildMessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.StickerItem;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.ReactionPaginationAction;
+import net.dv8tion.jda.api.utils.AttachedFile;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Formatter;
-import java.util.List;
-
-@SuppressWarnings("ConstantConditions")
 public class MessageMock implements Message {
 
     @Nullable
@@ -94,7 +110,7 @@ public class MessageMock implements Message {
     }
 
     @Override
-    public boolean isFromType(@NotNull ChannelType channelType) {
+    public boolean isFromType(@NotNull final ChannelType channelType) {
         return false;
     }
 
@@ -109,33 +125,13 @@ public class MessageMock implements Message {
         return false;
     }
 
-    @NotNull
     @Override
-    public MessageChannel getChannel() {
+    public MessageChannelUnion getChannel() {
         return new TextChannelMock("name", 0);
     }
 
-    @NotNull
     @Override
-    public GuildMessageChannel getGuildChannel() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public PrivateChannel getPrivateChannel() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public TextChannel getTextChannel() {
-        return null;
-    }
-
-    @NotNull
-    @Override
-    public NewsChannel getNewsChannel() {
+    public GuildMessageChannelUnion getGuildChannel() {
         return null;
     }
 
@@ -165,20 +161,26 @@ public class MessageMock implements Message {
 
     @NotNull
     @Override
+    public List<LayoutComponent> getComponents() {
+        return new ArrayList<>();
+    }
+
+    @NotNull
+    @Override
     public List<ActionRow> getActionRows() {
-        return null;
+        return new ArrayList<>();
     }
 
     @NotNull
     @Override
     public List<MessageReaction> getReactions() {
-        return null;
+        return new ArrayList<>();
     }
 
     @NotNull
     @Override
     public List<StickerItem> getStickers() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -194,31 +196,37 @@ public class MessageMock implements Message {
 
     @NotNull
     @Override
-    public MessageAction editMessage(@NotNull CharSequence charSequence) {
+    public MessageEditAction editMessage(@NotNull final CharSequence newContent) {
         return null;
     }
 
     @NotNull
     @Override
-    public MessageAction editMessageEmbeds(@NotNull Collection<? extends MessageEmbed> collection) {
+    public MessageEditAction editMessage(@NotNull final MessageEditData data) {
         return null;
     }
 
     @NotNull
     @Override
-    public MessageAction editMessageComponents(@NotNull Collection<? extends LayoutComponent> collection) {
+    public MessageEditAction editMessageEmbeds(@NotNull final Collection<? extends MessageEmbed> embeds) {
         return null;
     }
 
     @NotNull
     @Override
-    public MessageAction editMessageFormat(@NotNull String s, @NotNull Object... objects) {
+    public MessageEditAction editMessageComponents(@NotNull final Collection<? extends LayoutComponent> components) {
         return null;
     }
 
     @NotNull
     @Override
-    public MessageAction editMessage(@NotNull Message message) {
+    public MessageEditAction editMessageFormat(@NotNull final String format, @NotNull final Object... args) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public MessageEditAction editMessageAttachments(@NotNull final Collection<? extends AttachedFile> attachments) {
         return null;
     }
 
@@ -253,7 +261,7 @@ public class MessageMock implements Message {
 
     @NotNull
     @Override
-    public RestAction<Void> addReaction(@NotNull Emoji emoji) {
+    public RestAction<Void> addReaction(@NotNull final Emoji emoji) {
         return null;
     }
 
@@ -265,37 +273,37 @@ public class MessageMock implements Message {
 
     @NotNull
     @Override
-    public RestAction<Void> clearReactions(@NotNull Emoji emoji) {
+    public RestAction<Void> clearReactions(@NotNull final Emoji emoji) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> removeReaction(@NotNull Emoji emoji) {
+    public RestAction<Void> removeReaction(@NotNull final Emoji emoji) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> removeReaction(@NotNull Emoji emoji, @NotNull User user) {
+    public RestAction<Void> removeReaction(@NotNull final Emoji emoji, @NotNull final User user) {
         return null;
     }
 
     @NotNull
     @Override
-    public ReactionPaginationAction retrieveReactionUsers(@NotNull Emoji emoji) {
+    public ReactionPaginationAction retrieveReactionUsers(@NotNull final Emoji emoji) {
         return null;
     }
 
     @Nullable
     @Override
-    public MessageReaction getReaction(@NotNull Emoji emoji) {
+    public MessageReaction getReaction(@NotNull final Emoji emoji) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> suppressEmbeds(boolean b) {
+    public AuditableRestAction<Void> suppressEmbeds(final boolean b) {
         return null;
     }
 
@@ -345,12 +353,12 @@ public class MessageMock implements Message {
     }
 
     @Override
-    public RestAction<ThreadChannel> createThreadChannel(String s) {
+    public ThreadChannelAction createThreadChannel(final String name) {
         return null;
     }
 
     @Override
-    public void formatTo(Formatter formatter, int flags, int width, int precision) {
+    public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
 
     }
 

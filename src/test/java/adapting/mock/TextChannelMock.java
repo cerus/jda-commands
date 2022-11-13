@@ -1,26 +1,48 @@
 package adapting.mock;
 
+import java.util.Collection;
+import java.util.List;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.IPermissionHolder;
+import net.dv8tion.jda.api.entities.Invite;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.PermissionOverride;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.attribute.IPermissionContainer;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.StickerSnowflake;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.*;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
+import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.requests.restaction.InviteAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.requests.restaction.WebhookAction;
 import net.dv8tion.jda.api.requests.restaction.pagination.ThreadChannelPaginationAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-
-@SuppressWarnings("ConstantConditions")
-public class TextChannelMock implements TextChannel {
+public class TextChannelMock implements TextChannel, MessageChannelUnion {
 
     private final String name;
     private final long id;
 
-    public TextChannelMock(String name, long id) {
+    public TextChannelMock(final String name, final long id) {
         this.name = name;
         this.id = id;
     }
@@ -65,7 +87,7 @@ public class TextChannelMock implements TextChannel {
 
     @Nullable
     @Override
-    public PermissionOverride getPermissionOverride(@NotNull IPermissionHolder iPermissionHolder) {
+    public PermissionOverride getPermissionOverride(@NotNull final IPermissionHolder iPermissionHolder) {
         return null;
     }
 
@@ -89,7 +111,7 @@ public class TextChannelMock implements TextChannel {
 
     @NotNull
     @Override
-    public PermissionOverrideAction upsertPermissionOverride(@NotNull IPermissionHolder iPermissionHolder) {
+    public PermissionOverrideAction upsertPermissionOverride(@NotNull final IPermissionHolder iPermissionHolder) {
         return null;
     }
 
@@ -100,7 +122,7 @@ public class TextChannelMock implements TextChannel {
 
     @NotNull
     @Override
-    public ChannelAction<TextChannel> createCopy(@NotNull Guild guild) {
+    public ChannelAction<TextChannel> createCopy(@NotNull final Guild guild) {
         return null;
     }
 
@@ -153,43 +175,42 @@ public class TextChannelMock implements TextChannel {
 
     @NotNull
     @Override
-    public WebhookAction createWebhook(@NotNull String s) {
+    public WebhookAction createWebhook(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> deleteMessages(@NotNull Collection<Message> collection) {
+    public RestAction<Void> deleteMessages(@NotNull final Collection<Message> collection) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> deleteMessagesByIds(@NotNull Collection<String> collection) {
+    public RestAction<Void> deleteMessagesByIds(@NotNull final Collection<String> collection) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> deleteWebhookById(@NotNull String s) {
+    public AuditableRestAction<Void> deleteWebhookById(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> clearReactionsById(@NotNull String s) {
+    public RestAction<Void> clearReactionsById(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> clearReactionsById(@NotNull String s, @NotNull Emoji emoji) {
+    public RestAction<Void> clearReactionsById(@NotNull final String s, @NotNull final Emoji emoji) {
         return null;
     }
 
-    @NotNull
     @Override
-    public MessageAction sendStickers(@NotNull Collection<? extends StickerSnowflake> collection) {
+    public MessageCreateAction sendStickers(@NotNull final Collection<? extends StickerSnowflake> collection) {
         return null;
     }
 
@@ -199,18 +220,18 @@ public class TextChannelMock implements TextChannel {
     }
 
     @Override
-    public boolean canTalk(@NotNull Member member) {
+    public boolean canTalk(@NotNull final Member member) {
         return false;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> removeReactionById(@NotNull String s, @NotNull Emoji emoji, @NotNull User user) {
+    public RestAction<Void> removeReactionById(@NotNull final String s, @NotNull final Emoji emoji, @NotNull final User user) {
         return null;
     }
 
     @Override
-    public int compareTo(@NotNull GuildChannel o) {
+    public int compareTo(@NotNull final GuildChannel o) {
         return 0;
     }
 
@@ -222,7 +243,7 @@ public class TextChannelMock implements TextChannel {
     @NotNull
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @NotNull
@@ -245,18 +266,23 @@ public class TextChannelMock implements TextChannel {
 
     @Override
     public long getIdLong() {
-        return id;
+        return this.id;
+    }
+
+    @Override
+    public int getDefaultThreadSlowmode() {
+        return 0;
     }
 
     @NotNull
     @Override
-    public ThreadChannelAction createThreadChannel(String s, boolean b) {
+    public ThreadChannelAction createThreadChannel(final String s, final boolean b) {
         return null;
     }
 
     @NotNull
     @Override
-    public ThreadChannelAction createThreadChannel(String s, long l) {
+    public ThreadChannelAction createThreadChannel(final String s, final long l) {
         return null;
     }
 
@@ -275,6 +301,48 @@ public class TextChannelMock implements TextChannel {
     @NotNull
     @Override
     public ThreadChannelPaginationAction retrieveArchivedPrivateJoinedThreadChannels() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public PrivateChannel asPrivateChannel() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public TextChannel asTextChannel() {
+        return this;
+    }
+
+    @NotNull
+    @Override
+    public NewsChannel asNewsChannel() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ThreadChannel asThreadChannel() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public VoiceChannel asVoiceChannel() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public IThreadContainer asThreadContainer() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public GuildMessageChannel asGuildMessageChannel() {
         return null;
     }
 }

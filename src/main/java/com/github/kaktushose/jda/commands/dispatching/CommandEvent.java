@@ -10,15 +10,14 @@ import com.github.kaktushose.jda.commands.embeds.help.HelpMessageFactory;
 import com.github.kaktushose.jda.commands.interactions.components.Buttons;
 import com.github.kaktushose.jda.commands.interactions.components.Component;
 import com.github.kaktushose.jda.commands.reflect.CommandDefinition;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * This class is a subclass of {@link GenericEvent}.
@@ -45,16 +44,15 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @param command the underlying {@link CommandDefinition} object
      * @param context the {@link CommandContext}
      */
-    @SuppressWarnings("ConstantConditions")
-    public CommandEvent(@NotNull CommandDefinition command, @NotNull CommandContext context) {
+    public CommandEvent(@NotNull final CommandDefinition command, @NotNull final CommandContext context) {
         super(context.getEvent());
         this.command = command;
         this.context = context;
-        actionRows = new ArrayList<>();
+        this.actionRows = new ArrayList<>();
         if (context.isSlash()) {
-            replyCallback = new InteractionReplyCallback(context.getInteractionEvent(), actionRows);
+            this.replyCallback = new InteractionReplyCallback(context.getInteractionEvent(), this.actionRows);
         } else {
-            replyCallback = new TextReplyCallback(getChannel(), actionRows);
+            this.replyCallback = new TextReplyCallback(this.getChannel(), this.actionRows);
         }
     }
 
@@ -63,9 +61,9 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * {@link com.github.kaktushose.jda.commands.dispatching.sender.MessageSender MessageSender}
      */
     public void sendGenericHelpMessage() {
-        getJdaCommands().getImplementationRegistry().getMessageSender().sendGenericHelpMessage(
-                context,
-                getHelpMessageFactory().getGenericHelp(getJdaCommands().getCommandRegistry().getControllers(), context)
+        this.getJdaCommands().getImplementationRegistry().getMessageSender().sendGenericHelpMessage(
+                this.context,
+                this.getHelpMessageFactory().getGenericHelp(this.getJdaCommands().getCommandRegistry().getControllers(), this.context).build()
         );
     }
 
@@ -74,9 +72,9 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * {@link com.github.kaktushose.jda.commands.dispatching.sender.MessageSender MessageSender}
      */
     public void sendSpecificHelpMessage() {
-        getJdaCommands().getImplementationRegistry().getMessageSender().sendSpecificHelpMessage(
-                context,
-                getHelpMessageFactory().getSpecificHelp(context)
+        this.getJdaCommands().getImplementationRegistry().getMessageSender().sendSpecificHelpMessage(
+                this.context,
+                this.getHelpMessageFactory().getSpecificHelp(this.context).build()
         );
     }
 
@@ -84,14 +82,14 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * Replies to this event with the generic help embed.
      */
     public void replyGenericHelp() {
-        reply(getHelpMessageFactory().getGenericHelp(getJdaCommands().getCommandRegistry().getControllers(), context));
+        this.reply(this.getHelpMessageFactory().getGenericHelp(this.getJdaCommands().getCommandRegistry().getControllers(), this.context));
     }
 
     /**
      * Replies to this event with the specific help embed.
      */
     public void replySpecificHelp() {
-        reply(getHelpMessageFactory().getSpecificHelp(context));
+        this.reply(this.getHelpMessageFactory().getSpecificHelp(this.context));
     }
 
     /**
@@ -99,8 +97,8 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      *
      * @param ephemeral whether to send an ephemeral reply
      */
-    public void replyGenericHelp(boolean ephemeral) {
-        reply(getHelpMessageFactory().getGenericHelp(getJdaCommands().getCommandRegistry().getControllers(), context), ephemeral);
+    public void replyGenericHelp(final boolean ephemeral) {
+        this.reply(this.getHelpMessageFactory().getGenericHelp(this.getJdaCommands().getCommandRegistry().getControllers(), this.context), ephemeral);
     }
 
     /**
@@ -108,21 +106,21 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      *
      * @param ephemeral whether to send an ephemeral reply
      */
-    public void replySpecificHelp(boolean ephemeral) {
-        reply(getHelpMessageFactory().getSpecificHelp(context), ephemeral);
+    public void replySpecificHelp(final boolean ephemeral) {
+        this.reply(this.getHelpMessageFactory().getSpecificHelp(this.context), ephemeral);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public CommandEvent with(@NotNull Component... components) {
-        List<ItemComponent> items = new ArrayList<>();
-        for (Component component : components) {
+    @Override
+    public CommandEvent with(@NotNull final Component... components) {
+        final List<ItemComponent> items = new ArrayList<>();
+        for (final Component component : components) {
             if (!(component instanceof Buttons)) {
                 return this;
             }
-            Buttons buttons = (Buttons) component;
+            final Buttons buttons = (Buttons) component;
             buttons.getButtons().forEach(button -> {
-                String id = String.format("%s.%s", command.getMethod().getDeclaringClass().getSimpleName(), button.getId());
-                command.getController().getButtons()
+                final String id = String.format("%s.%s", this.command.getMethod().getDeclaringClass().getSimpleName(), button.getId());
+                this.command.getController().getButtons()
                         .stream()
                         .filter(it -> it.getId().equals(id))
                         .findFirst()
@@ -131,7 +129,7 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
             });
         }
         if (items.size() > 0) {
-            actionRows.add(ActionRow.of(items));
+            this.actionRows.add(ActionRow.of(items));
         }
         return this;
     }
@@ -142,7 +140,7 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @return the underlying {@link CommandDefinition} object
      */
     public CommandDefinition getCommandDefinition() {
-        return command;
+        return this.command;
     }
 
     /**
@@ -151,7 +149,7 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @return the {@link JDACommands} object
      */
     public JDACommands getJdaCommands() {
-        return context.getJdaCommands();
+        return this.context.getJdaCommands();
     }
 
     /**
@@ -160,7 +158,7 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @return the registered {@link HelpMessageFactory} object
      */
     public HelpMessageFactory getHelpMessageFactory() {
-        return getJdaCommands().getImplementationRegistry().getHelpMessageFactory();
+        return this.getJdaCommands().getImplementationRegistry().getHelpMessageFactory();
     }
 
     /**
@@ -169,7 +167,7 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @return the registered {@link CommandContext} object
      */
     public CommandContext getCommandContext() {
-        return context;
+        return this.context;
     }
 
     /**
@@ -179,7 +177,7 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @return an {@link Optional} holding the {@link InteractionHook}.
      */
     public Optional<InteractionHook> getInteractionHook() {
-        return Optional.ofNullable(context.getInteractionEvent()).map(GenericCommandInteractionEvent::getHook);
+        return Optional.ofNullable(this.context.getInteractionEvent()).map(GenericCommandInteractionEvent::getHook);
     }
 
     /**
@@ -188,12 +186,12 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      * @return a possibly-empty {@link List} of {@link ActionRow ActionRows}.
      */
     public List<ActionRow> getActionRows() {
-        return new ArrayList<>(actionRows);
+        return new ArrayList<>(this.actionRows);
     }
 
     @Override
     public @NotNull ReplyCallback getReplyCallback() {
-        return replyCallback;
+        return this.replyCallback;
     }
 
     /**
@@ -201,12 +199,12 @@ public class CommandEvent extends GenericEvent implements ReplyAction {
      *
      * @param replyCallback the {@link ReplyCallback} to use
      */
-    public void setReplyCallback(ReplyCallback replyCallback) {
+    public void setReplyCallback(final ReplyCallback replyCallback) {
         this.replyCallback = replyCallback;
     }
 
     @Override
     public boolean isEphemeral() {
-        return command.isEphemeral();
+        return this.command.isEphemeral();
     }
 }

@@ -18,18 +18,17 @@ import com.github.kaktushose.jda.commands.interactions.commands.SlashConfigurati
 import com.github.kaktushose.jda.commands.reflect.CommandDefinition;
 import com.github.kaktushose.jda.commands.reflect.CommandRegistry;
 import com.github.kaktushose.jda.commands.reflect.ImplementationRegistry;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Dispatches commands by taking a {@link CommandContext} and passing it through the execution chain.
@@ -63,13 +62,14 @@ public class CommandDispatcher {
      * @param packages      optional packages to exclusively scan
      * @param clazz         a class of the classpath to scan
      * @param configuration the corresponding {@link SlashConfiguration}
+     *
      * @throws IllegalStateException if an instance of this class is already active.
      */
-    public CommandDispatcher(@NotNull JDAContext jdaContext,
-                             @NotNull JDACommands jdaCommands,
-                             @NotNull Class<?> clazz,
-                             @NotNull SlashConfiguration configuration,
-                             @NotNull String... packages) {
+    public CommandDispatcher(@NotNull final JDAContext jdaContext,
+                             @NotNull final JDACommands jdaCommands,
+                             @NotNull final Class<?> clazz,
+                             @NotNull final SlashConfiguration configuration,
+                             @NotNull final String... packages) {
         this.jdaContext = jdaContext;
         this.jdaCommands = jdaCommands;
         this.configuration = configuration;
@@ -78,27 +78,27 @@ public class CommandDispatcher {
             throw new IllegalStateException("An instance of the command framework is already running!");
         }
 
-        dependencyInjector = new DependencyInjector();
-        dependencyInjector.index(clazz, packages);
+        this.dependencyInjector = new DependencyInjector();
+        this.dependencyInjector.index(clazz, packages);
 
-        filterRegistry = new FilterRegistry();
-        adapterRegistry = new TypeAdapterRegistry();
-        validatorRegistry = new ValidatorRegistry();
+        this.filterRegistry = new FilterRegistry();
+        this.adapterRegistry = new TypeAdapterRegistry();
+        this.validatorRegistry = new ValidatorRegistry();
 
-        implementationRegistry = new ImplementationRegistry(dependencyInjector, filterRegistry, adapterRegistry, validatorRegistry);
-        implementationRegistry.index(clazz, packages);
+        this.implementationRegistry = new ImplementationRegistry(this.dependencyInjector, this.filterRegistry, this.adapterRegistry, this.validatorRegistry);
+        this.implementationRegistry.index(clazz, packages);
 
-        parserSupervisor = new ParserSupervisor(this);
-        buttonListener = new ButtonInteractionDispatcher(jdaCommands);
-        jdaContext.performTask(jda -> jda.addEventListener(parserSupervisor, buttonListener));
+        this.parserSupervisor = new ParserSupervisor(this);
+        this.buttonListener = new ButtonInteractionDispatcher(jdaCommands);
+        jdaContext.performTask(jda -> jda.addEventListener(this.parserSupervisor, this.buttonListener));
 
-        commandRegistry = new CommandRegistry(adapterRegistry, validatorRegistry, dependencyInjector, buttonListener);
-        commandRegistry.index(clazz, packages);
+        this.commandRegistry = new CommandRegistry(this.adapterRegistry, this.validatorRegistry, this.dependencyInjector, this.buttonListener);
+        this.commandRegistry.index(clazz, packages);
 
-        dependencyInjector.inject();
+        this.dependencyInjector.inject();
 
-        updater = new SlashCommandUpdater(jdaContext, configuration);
-        updater.update(commandRegistry.getCommands());
+        this.updater = new SlashCommandUpdater(jdaContext, configuration);
+        this.updater.update(this.commandRegistry.getCommands());
         isActive = true;
     }
 
@@ -116,8 +116,8 @@ public class CommandDispatcher {
      * This will <b>not</b> unregister any slash commands.
      */
     public void shutdown() {
-        jdaContext.performTask(jda -> jda.removeEventListener(parserSupervisor, buttonListener));
-        updater.shutdown();
+        this.jdaContext.performTask(jda -> jda.removeEventListener(this.parserSupervisor, this.buttonListener));
+        this.updater.shutdown();
         isActive = false;
     }
 
@@ -127,44 +127,44 @@ public class CommandDispatcher {
      *
      * @param context the {@link CommandContext} to dispatch.
      */
-    public void onEvent(@NotNull CommandContext context) {
+    public void onEvent(@NotNull final CommandContext context) {
         log.debug("Applying filters in phase BEFORE_ROUTING...");
-        for (Filter filter : filterRegistry.getAll(FilterPosition.BEFORE_ROUTING)) {
+        for (final Filter filter : this.filterRegistry.getAll(FilterPosition.BEFORE_ROUTING)) {
             filter.apply(context);
-            if (checkCancelled(context)) {
+            if (this.checkCancelled(context)) {
                 return;
             }
         }
 
-        HelpMessageFactory helpMessageFactory = implementationRegistry.getHelpMessageFactory();
-        Router router = implementationRegistry.getRouter();
-        MessageSender sender = implementationRegistry.getMessageSender();
+        final HelpMessageFactory helpMessageFactory = this.implementationRegistry.getHelpMessageFactory();
+        final Router router = this.implementationRegistry.getRouter();
+        final MessageSender sender = this.implementationRegistry.getMessageSender();
 
-        router.findCommands(context, commandRegistry.getCommands());
+        router.findCommands(context, this.commandRegistry.getCommands());
 
         if (context.isCancelled() && context.isHelpEvent()) {
             log.debug("Sending generic help");
-            sender.sendGenericHelpMessage(context, helpMessageFactory.getGenericHelp(commandRegistry.getControllers(), context));
+            sender.sendGenericHelpMessage(context, helpMessageFactory.getGenericHelp(this.commandRegistry.getControllers(), context).build());
             return;
         }
 
-        if (checkCancelled(context)) {
+        if (this.checkCancelled(context)) {
             log.debug("No matching command found!");
             return;
         }
 
-        CommandDefinition command = Objects.requireNonNull(context.getCommand());
+        final CommandDefinition command = Objects.requireNonNull(context.getCommand());
         log.debug("Input matches command: {}", command);
 
         if (context.isHelpEvent()) {
             log.debug("Sending specific help");
-            sender.sendSpecificHelpMessage(context, helpMessageFactory.getSpecificHelp(context));
+            sender.sendSpecificHelpMessage(context, helpMessageFactory.getSpecificHelp(context).build());
             return;
         }
 
         if (context.isSlash()) {
-            List<String> parameters = new ArrayList<>();
-            Map<String, OptionMapping> options = context.getOptionsAsMap();
+            final List<String> parameters = new ArrayList<>();
+            final Map<String, OptionMapping> options = context.getOptionsAsMap();
             command.getActualParameters().forEach(param -> {
                 if (!options.containsKey(param.getName())) {
                     return;
@@ -172,32 +172,32 @@ public class CommandDispatcher {
                 parameters.add(options.get(param.getName()).getAsString());
             });
             if (!parameters.isEmpty()) {
-                context.setInput(parameters.toArray(new String[]{}));
+                context.setInput(parameters.toArray(new String[] {}));
             }
         }
 
         log.debug("Applying filters in phase BEFORE_ADAPTING...");
-        for (Filter filter : filterRegistry.getAll(FilterPosition.BEFORE_ADAPTING)) {
+        for (final Filter filter : this.filterRegistry.getAll(FilterPosition.BEFORE_ADAPTING)) {
             filter.apply(context);
-            if (checkCancelled(context)) {
+            if (this.checkCancelled(context)) {
                 return;
             }
         }
 
-        adapterRegistry.adapt(context);
-        if (checkCancelled(context)) {
+        this.adapterRegistry.adapt(context);
+        if (this.checkCancelled(context)) {
             return;
         }
 
         log.debug("Applying filters in phase BEFORE_EXECUTION...");
-        for (Filter filter : filterRegistry.getAll(FilterPosition.BEFORE_EXECUTION)) {
+        for (final Filter filter : this.filterRegistry.getAll(FilterPosition.BEFORE_EXECUTION)) {
             filter.apply(context);
-            if (checkCancelled(context)) {
+            if (this.checkCancelled(context)) {
                 return;
             }
         }
 
-        if (checkCancelled(context)) {
+        if (this.checkCancelled(context)) {
             return;
         }
 
@@ -208,14 +208,14 @@ public class CommandDispatcher {
             }
             log.debug("Invoking method with following arguments: {}", context.getArguments());
             command.getMethod().invoke(command.getInstance(), context.getArguments().toArray());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("Command execution failed!", new InvocationTargetException(e));
         }
     }
 
-    private boolean checkCancelled(CommandContext context) {
+    private boolean checkCancelled(final CommandContext context) {
         if (context.isCancelled()) {
-            implementationRegistry.getMessageSender().sendErrorMessage(context, Objects.requireNonNull(context.getErrorMessage()));
+            this.implementationRegistry.getMessageSender().sendErrorMessage(context, Objects.requireNonNull(context.getErrorMessage()).build());
             return true;
         }
         return false;
@@ -227,7 +227,7 @@ public class CommandDispatcher {
      * @return the {@link ImplementationRegistry}
      */
     public ImplementationRegistry getImplementationRegistry() {
-        return implementationRegistry;
+        return this.implementationRegistry;
     }
 
     /**
@@ -236,7 +236,7 @@ public class CommandDispatcher {
      * @return the {@link ParserSupervisor}
      */
     public ParserSupervisor getParserSupervisor() {
-        return parserSupervisor;
+        return this.parserSupervisor;
     }
 
     /**
@@ -245,7 +245,7 @@ public class CommandDispatcher {
      * @return the {@link TypeAdapterRegistry}
      */
     public TypeAdapterRegistry getAdapterRegistry() {
-        return adapterRegistry;
+        return this.adapterRegistry;
     }
 
     /**
@@ -254,7 +254,7 @@ public class CommandDispatcher {
      * @return the {@link ValidatorRegistry}
      */
     public ValidatorRegistry getValidatorRegistry() {
-        return validatorRegistry;
+        return this.validatorRegistry;
     }
 
     /**
@@ -263,7 +263,7 @@ public class CommandDispatcher {
      * @return the {@link CommandRegistry}
      */
     public CommandRegistry getCommandRegistry() {
-        return commandRegistry;
+        return this.commandRegistry;
     }
 
     /**
@@ -271,20 +271,22 @@ public class CommandDispatcher {
      * to distinguish.
      *
      * @return the JDA instance.
+     *
      * @deprecated use {@link #getJdaContext()}
      */
     public Object getJda() {
-        return jdaContext.getJDAObject();
+        return this.jdaContext.getJDAObject();
     }
 
     /**
      * Whether the JDA instance is a {@link ShardManager}.
      *
      * @return {@code true} if the JDA instance is a {@link ShardManager}
+     *
      * @deprecated use {@link #getJdaContext()}
      */
     public boolean isShardManager() {
-        return jdaContext.isShardManager();
+        return this.jdaContext.isShardManager();
     }
 
     /**
@@ -293,7 +295,7 @@ public class CommandDispatcher {
      * @return the JDAContext.
      */
     public JDAContext getJdaContext() {
-        return jdaContext;
+        return this.jdaContext;
     }
 
     /**
@@ -302,7 +304,7 @@ public class CommandDispatcher {
      * @return the {@link FilterRegistry}
      */
     public FilterRegistry getFilterRegistry() {
-        return filterRegistry;
+        return this.filterRegistry;
     }
 
     /**
@@ -311,7 +313,7 @@ public class CommandDispatcher {
      * @return the {@link HelpMessageFactory}
      */
     public HelpMessageFactory getHelpMessageFactory() {
-        return implementationRegistry.getHelpMessageFactory();
+        return this.implementationRegistry.getHelpMessageFactory();
     }
 
     /**
@@ -320,7 +322,7 @@ public class CommandDispatcher {
      * @return the {@link JDACommands} instance
      */
     public JDACommands getJdaCommands() {
-        return jdaCommands;
+        return this.jdaCommands;
     }
 
     /**
@@ -329,7 +331,7 @@ public class CommandDispatcher {
      * @return the {@link DependencyInjector}
      */
     public DependencyInjector getDependencyInjector() {
-        return dependencyInjector;
+        return this.dependencyInjector;
     }
 
     /**
@@ -338,6 +340,6 @@ public class CommandDispatcher {
      * @return the {@link SlashConfiguration}
      */
     public SlashConfiguration getSlashConfiguration() {
-        return configuration;
+        return this.configuration;
     }
 }

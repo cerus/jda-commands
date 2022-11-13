@@ -1,17 +1,15 @@
 package com.github.kaktushose.jda.commands.embeds;
 
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-
-import java.awt.*;
+import java.awt.Color;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 /**
  * This class is a DTO to serialize and deserialize JDA's embed objects to json. Checkout the discord docs to get
@@ -44,16 +42,16 @@ public class EmbedDTO implements Serializable {
     public EmbedDTO() {
     }
 
-    public EmbedDTO(String title,
-                    String description,
-                    String url,
-                    String color,
-                    String timestamp,
-                    Footer footer,
-                    Thumbnail thumbnail,
-                    Image image,
-                    Author author,
-                    Field[] fields) {
+    public EmbedDTO(final String title,
+                    final String description,
+                    final String url,
+                    final String color,
+                    final String timestamp,
+                    final Footer footer,
+                    final Thumbnail thumbnail,
+                    final Image image,
+                    final Author author,
+                    final Field[] fields) {
         this.title = title;
         this.description = description;
         this.url = url;
@@ -66,7 +64,7 @@ public class EmbedDTO implements Serializable {
         this.fields = fields;
     }
 
-    public EmbedDTO(EmbedDTO embedDTO) {
+    public EmbedDTO(final EmbedDTO embedDTO) {
         this.title = embedDTO.getTitle();
         this.description = embedDTO.getDescription();
         this.url = embedDTO.getUrl();
@@ -78,8 +76,8 @@ public class EmbedDTO implements Serializable {
         this.author = new Author(embedDTO.getAuthor());
         if (embedDTO.getFields() != null) {
             this.fields = new Field[embedDTO.getFields().length];
-            for (int i = 0; i < fields.length; i++) {
-                fields[i] = new Field(embedDTO.getFields()[i]);
+            for (int i = 0; i < this.fields.length; i++) {
+                this.fields[i] = new Field(embedDTO.getFields()[i]);
             }
         }
     }
@@ -87,100 +85,100 @@ public class EmbedDTO implements Serializable {
     @Override
     public String toString() {
         return "Embed{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", url='" + url + '\'' +
-                ", color=" + color +
-                ", timestamp='" + timestamp + '\'' +
-                ", footer=" + toString(footer) +
-                ", thumbnail=" + toString(thumbnail) +
-                ", image=" + toString(image) +
-                ", author=" + toString(author) +
-                ", fields=" + Arrays.toString(fields) +
+                "title='" + this.title + '\'' +
+                ", description='" + this.description + '\'' +
+                ", url='" + this.url + '\'' +
+                ", color=" + this.color +
+                ", timestamp='" + this.timestamp + '\'' +
+                ", footer=" + this.toString(this.footer) +
+                ", thumbnail=" + this.toString(this.thumbnail) +
+                ", image=" + this.toString(this.image) +
+                ", author=" + this.toString(this.author) +
+                ", fields=" + Arrays.toString(this.fields) +
                 '}';
     }
 
-    private String toString(Object object) {
+    private String toString(final Object object) {
         return object == null ? null : object.toString();
     }
 
     public String getTitle() {
-        return title;
+        return this.title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.url = url;
     }
 
     public String getColor() {
-        return color;
+        return this.color;
     }
 
-    public void setColor(String color) {
+    public void setColor(final String color) {
         this.color = color;
     }
 
     public String getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(final String timestamp) {
         this.timestamp = timestamp;
     }
 
     public Footer getFooter() {
-        return footer;
+        return this.footer;
     }
 
-    public void setFooter(Footer footer) {
+    public void setFooter(final Footer footer) {
         this.footer = footer;
     }
 
     public Thumbnail getThumbnail() {
-        return thumbnail;
+        return this.thumbnail;
     }
 
-    public void setThumbnail(Thumbnail thumbnail) {
+    public void setThumbnail(final Thumbnail thumbnail) {
         this.thumbnail = thumbnail;
     }
 
     public Image getImage() {
-        return image;
+        return this.image;
     }
 
-    public void setImage(Image image) {
+    public void setImage(final Image image) {
         this.image = image;
     }
 
     public Author getAuthor() {
-        return author;
+        return this.author;
     }
 
-    public void setAuthor(Author author) {
+    public void setAuthor(final Author author) {
         this.author = author;
     }
 
     public Field[] getFields() {
-        return fields;
+        return this.fields;
     }
 
-    public void setFields(Field[] fields) {
+    public void setFields(final Field[] fields) {
         this.fields = fields;
     }
 
@@ -190,33 +188,33 @@ public class EmbedDTO implements Serializable {
      * @return the {@code EmbedBuilder}
      */
     public EmbedBuilder toEmbedBuilder() {
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        if (title != null) {
-            embedBuilder.setTitle(title, url);
+        final EmbedBuilder embedBuilder = new EmbedBuilder();
+        if (this.title != null) {
+            embedBuilder.setTitle(this.title, this.url);
         }
-        if (description != null) {
-            embedBuilder.setDescription(description);
+        if (this.description != null) {
+            embedBuilder.setDescription(this.description);
         }
-        if (color != null) {
-            embedBuilder.setColor(Color.decode(color));
+        if (this.color != null) {
+            embedBuilder.setColor(Color.decode(this.color));
         }
-        if (timestamp != null) {
-            embedBuilder.setTimestamp(ZonedDateTime.parse(timestamp));
+        if (this.timestamp != null) {
+            embedBuilder.setTimestamp(ZonedDateTime.parse(this.timestamp));
         }
-        if (footer != null) {
-            embedBuilder.setFooter(footer.getText(), footer.getIconUrl());
+        if (this.footer != null) {
+            embedBuilder.setFooter(this.footer.getText(), this.footer.getIconUrl());
         }
-        if (thumbnail != null) {
-            embedBuilder.setThumbnail(thumbnail.getUrl());
+        if (this.thumbnail != null) {
+            embedBuilder.setThumbnail(this.thumbnail.getUrl());
         }
-        if (image != null) {
-            embedBuilder.setImage(image.getUrl());
+        if (this.image != null) {
+            embedBuilder.setImage(this.image.getUrl());
         }
-        if (author != null) {
-            embedBuilder.setAuthor(author.getName(), author.getUrl(), author.getIconUrl());
+        if (this.author != null) {
+            embedBuilder.setAuthor(this.author.getName(), this.author.getUrl(), this.author.getIconUrl());
         }
-        if (fields != null) {
-            for (Field field : fields) {
+        if (this.fields != null) {
+            for (final Field field : this.fields) {
                 embedBuilder.addField(field.getName(), field.getValue(), field.isInline());
             }
         }
@@ -229,7 +227,7 @@ public class EmbedDTO implements Serializable {
      * @return the {@code MessageEmbed}
      */
     public MessageEmbed toMessageEmbed() {
-        return toEmbedBuilder().build();
+        return this.toEmbedBuilder().build();
     }
 
     /**
@@ -237,8 +235,8 @@ public class EmbedDTO implements Serializable {
      *
      * @return the {@link net.dv8tion.jda.api.entities.Message}
      */
-    public Message toMessage() {
-        return new MessageBuilder().setEmbeds(toMessageEmbed()).build();
+    public MessageCreateBuilder toMessage() {
+        return new MessageCreateBuilder().setEmbeds(this.toMessageEmbed());
     }
 
     /**
@@ -246,15 +244,16 @@ public class EmbedDTO implements Serializable {
      * field must match the name of the {@code {placeholder}}.
      *
      * @param objects the objects to get the fields from
+     *
      * @return the current instance to use fluent interface
      */
-    public EmbedDTO injectFields(Object... objects) {
-        for (Object object : objects) {
-            for (java.lang.reflect.Field field : object.getClass().getDeclaredFields()) {
+    public EmbedDTO injectFields(final Object... objects) {
+        for (final Object object : objects) {
+            for (final java.lang.reflect.Field field : object.getClass().getDeclaredFields()) {
                 try {
                     field.setAccessible(true);
-                    injectValue(field.getName(), field.get(object));
-                } catch (IllegalAccessException e) {
+                    this.injectValue(field.getName(), field.get(object));
+                } catch (final IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -266,9 +265,10 @@ public class EmbedDTO implements Serializable {
      * Attempts to inject {@code {placeholders}} with the given values.
      *
      * @param values a Map with all values to inject. Key: name of the placeholder. Value: the value to inject
+     *
      * @return the current instance to use fluent interface
      */
-    public EmbedDTO injectValues(Map<String, Object> values) {
+    public EmbedDTO injectValues(final Map<String, Object> values) {
         values.forEach(this::injectValue);
         return this;
     }
@@ -278,71 +278,72 @@ public class EmbedDTO implements Serializable {
      *
      * @param name   the name of the placeholder
      * @param object the value to inject
+     *
      * @return the current instance to use fluent interface
      */
-    public EmbedDTO injectValue(String name, Object object) {
-        if (title != null) {
-            title = title.replaceAll(pattern(name), replacement(object));
+    public EmbedDTO injectValue(final String name, final Object object) {
+        if (this.title != null) {
+            this.title = this.title.replaceAll(this.pattern(name), this.replacement(object));
         }
-        if (description != null) {
-            description = description.replaceAll(pattern(name), replacement(object));
+        if (this.description != null) {
+            this.description = this.description.replaceAll(this.pattern(name), this.replacement(object));
         }
-        if (url != null) {
-            url = url.replaceAll(pattern(name), replacement(object));
+        if (this.url != null) {
+            this.url = this.url.replaceAll(this.pattern(name), this.replacement(object));
         }
-        if (color != null) {
-            color = color.replaceAll(pattern(name), replacement(object));
+        if (this.color != null) {
+            this.color = this.color.replaceAll(this.pattern(name), this.replacement(object));
         }
-        if (timestamp != null) {
-            timestamp = timestamp.replaceAll(pattern(name), replacement(object));
+        if (this.timestamp != null) {
+            this.timestamp = this.timestamp.replaceAll(this.pattern(name), this.replacement(object));
         }
-        if (footer != null) {
-            if (footer.iconUrl != null) {
-                footer.iconUrl = footer.iconUrl.replaceAll(pattern(name), replacement(object));
+        if (this.footer != null) {
+            if (this.footer.iconUrl != null) {
+                this.footer.iconUrl = this.footer.iconUrl.replaceAll(this.pattern(name), this.replacement(object));
             }
-            if (footer.text != null) {
-                footer.text = footer.text.replaceAll(pattern(name), replacement(object));
-            }
-        }
-        if (thumbnail != null) {
-            if (thumbnail.url != null) {
-                thumbnail.url = thumbnail.url.replaceAll(pattern(name), replacement(object));
+            if (this.footer.text != null) {
+                this.footer.text = this.footer.text.replaceAll(this.pattern(name), this.replacement(object));
             }
         }
-        if (image != null) {
-            if (image.url != null) {
-                image.url = image.url.replaceAll(pattern(name), replacement(object));
+        if (this.thumbnail != null) {
+            if (this.thumbnail.url != null) {
+                this.thumbnail.url = this.thumbnail.url.replaceAll(this.pattern(name), this.replacement(object));
             }
         }
-        if (author != null) {
-            if (author.iconUrl != null) {
-                author.iconUrl = author.iconUrl.replaceAll(pattern(name), replacement(object));
-            }
-            if (author.name != null) {
-                author.name = author.name.replaceAll(pattern(name), replacement(object));
-            }
-            if (author.url != null) {
-                author.url = author.url.replaceAll(pattern(name), replacement(object));
+        if (this.image != null) {
+            if (this.image.url != null) {
+                this.image.url = this.image.url.replaceAll(this.pattern(name), this.replacement(object));
             }
         }
-        if (fields != null) {
-            for (Field field : fields) {
+        if (this.author != null) {
+            if (this.author.iconUrl != null) {
+                this.author.iconUrl = this.author.iconUrl.replaceAll(this.pattern(name), this.replacement(object));
+            }
+            if (this.author.name != null) {
+                this.author.name = this.author.name.replaceAll(this.pattern(name), this.replacement(object));
+            }
+            if (this.author.url != null) {
+                this.author.url = this.author.url.replaceAll(this.pattern(name), this.replacement(object));
+            }
+        }
+        if (this.fields != null) {
+            for (final Field field : this.fields) {
                 if (field.name != null) {
-                    field.name = field.name.replaceAll(pattern(name), replacement(object));
+                    field.name = field.name.replaceAll(this.pattern(name), this.replacement(object));
                 }
                 if (field.value != null) {
-                    field.value = field.value.replaceAll(pattern(name), replacement(object));
+                    field.value = field.value.replaceAll(this.pattern(name), this.replacement(object));
                 }
             }
         }
         return this;
     }
 
-    private String pattern(String name) {
+    private String pattern(final String name) {
         return String.format(Pattern.quote("{%s}"), name);
     }
 
-    private String replacement(Object object) {
+    private String replacement(final Object object) {
         return Matcher.quoteReplacement(String.valueOf(object));
     }
 
@@ -353,55 +354,56 @@ public class EmbedDTO implements Serializable {
      * @param args Arguments referenced by the format specifiers in the format string. If there are more arguments than
      *             format specifiers, the extra arguments are ignored. The number of arguments is variable and may be
      *             zero.
+     *
      * @return the current instance to use fluent interface
      */
-    public EmbedDTO injectFormat(Object... args) {
-        if (title != null) {
-            title = String.format(title, args);
+    public EmbedDTO injectFormat(final Object... args) {
+        if (this.title != null) {
+            this.title = String.format(this.title, args);
         }
-        if (description != null) {
-            description = String.format(description, args);
+        if (this.description != null) {
+            this.description = String.format(this.description, args);
         }
-        if (url != null) {
-            url = String.format(url, args);
+        if (this.url != null) {
+            this.url = String.format(this.url, args);
         }
-        if (color != null) {
-            color = String.format(color, args);
+        if (this.color != null) {
+            this.color = String.format(this.color, args);
         }
-        if (timestamp != null) {
-            timestamp = String.format(timestamp, args);
+        if (this.timestamp != null) {
+            this.timestamp = String.format(this.timestamp, args);
         }
-        if (footer != null) {
-            if (footer.iconUrl != null) {
-                footer.iconUrl = String.format(footer.iconUrl, args);
+        if (this.footer != null) {
+            if (this.footer.iconUrl != null) {
+                this.footer.iconUrl = String.format(this.footer.iconUrl, args);
             }
-            if (footer.text != null) {
-                footer.text = String.format(footer.text, args);
-            }
-        }
-        if (thumbnail != null) {
-            if (thumbnail.url != null) {
-                thumbnail.url = String.format(thumbnail.url, args);
+            if (this.footer.text != null) {
+                this.footer.text = String.format(this.footer.text, args);
             }
         }
-        if (image != null) {
-            if (image.url != null) {
-                image.url = String.format(image.url, args);
+        if (this.thumbnail != null) {
+            if (this.thumbnail.url != null) {
+                this.thumbnail.url = String.format(this.thumbnail.url, args);
             }
         }
-        if (author != null) {
-            if (author.iconUrl != null) {
-                author.iconUrl = String.format(author.iconUrl, args);
-            }
-            if (author.name != null) {
-                author.name = String.format(author.name, args);
-            }
-            if (author.url != null) {
-                author.url = String.format(author.url, args);
+        if (this.image != null) {
+            if (this.image.url != null) {
+                this.image.url = String.format(this.image.url, args);
             }
         }
-        if (fields != null) {
-            for (Field field : fields) {
+        if (this.author != null) {
+            if (this.author.iconUrl != null) {
+                this.author.iconUrl = String.format(this.author.iconUrl, args);
+            }
+            if (this.author.name != null) {
+                this.author.name = String.format(this.author.name, args);
+            }
+            if (this.author.url != null) {
+                this.author.url = String.format(this.author.url, args);
+            }
+        }
+        if (this.fields != null) {
+            for (final Field field : this.fields) {
                 if (field.name != null) {
                     field.name = String.format(field.name, args);
                 }
@@ -414,15 +416,16 @@ public class EmbedDTO implements Serializable {
     }
 
     public static class Footer {
+
         private String iconUrl;
         private String text;
 
-        public Footer(String iconUrl, String text) {
+        public Footer(final String iconUrl, final String text) {
             this.iconUrl = iconUrl;
             this.text = text;
         }
 
-        public Footer(Footer footer) {
+        public Footer(final Footer footer) {
             if (footer != null) {
                 this.iconUrl = footer.getIconUrl();
                 this.text = footer.getText();
@@ -430,84 +433,87 @@ public class EmbedDTO implements Serializable {
         }
 
         public String getIconUrl() {
-            return iconUrl;
+            return this.iconUrl;
         }
 
         public String getText() {
-            return text;
+            return this.text;
         }
 
         @Override
         public String toString() {
             return "Footer{" +
-                    "iconUrl='" + iconUrl + '\'' +
-                    ", text='" + text + '\'' +
+                    "iconUrl='" + this.iconUrl + '\'' +
+                    ", text='" + this.text + '\'' +
                     '}';
         }
     }
 
     public static class Thumbnail {
+
         private String url;
 
-        public Thumbnail(String url) {
+        public Thumbnail(final String url) {
             this.url = url;
         }
 
-        public Thumbnail(Thumbnail thumbnail) {
+        public Thumbnail(final Thumbnail thumbnail) {
             if (thumbnail != null) {
                 this.url = thumbnail.getUrl();
             }
         }
 
         public String getUrl() {
-            return url;
+            return this.url;
         }
 
         @Override
         public String toString() {
             return "Thumbnail{" +
-                    "url='" + url + '\'' +
+                    "url='" + this.url + '\'' +
                     '}';
         }
     }
 
     public static class Image {
+
         private String url;
 
-        public Image(String url) {
+        public Image(final String url) {
             this.url = url;
         }
 
-        public Image(Image image) {
+        public Image(final Image image) {
             if (image != null) {
                 this.url = image.getUrl();
             }
         }
 
         public String getUrl() {
-            return url;
+            return this.url;
         }
 
         @Override
         public String toString() {
             return "Image{" +
-                    "url='" + url + '\'' +
+                    "url='" + this.url + '\'' +
                     '}';
         }
     }
 
     public static class Author {
+
         private String name;
         private String url;
         private String iconUrl;
 
-        public Author(String name, String url, String iconUrl) {
+        public Author(final String name, final String url, final String iconUrl) {
             this.name = name;
             this.url = url;
             this.iconUrl = iconUrl;
         }
 
-        public Author(Author author) {
+        public Author(final Author author) {
             if (author != null) {
                 this.name = author.getName();
                 this.url = author.getUrl();
@@ -516,39 +522,40 @@ public class EmbedDTO implements Serializable {
         }
 
         public String getName() {
-            return name;
+            return this.name;
         }
 
         public String getUrl() {
-            return url;
+            return this.url;
         }
 
         public String getIconUrl() {
-            return iconUrl;
+            return this.iconUrl;
         }
 
         @Override
         public String toString() {
             return "Author{" +
-                    "name='" + name + '\'' +
-                    ", url='" + url + '\'' +
-                    ", iconUrl='" + iconUrl + '\'' +
+                    "name='" + this.name + '\'' +
+                    ", url='" + this.url + '\'' +
+                    ", iconUrl='" + this.iconUrl + '\'' +
                     '}';
         }
     }
 
     public static class Field {
+
         private String name;
         private String value;
         private boolean inline;
 
-        public Field(String name, String value, boolean inline) {
+        public Field(final String name, final String value, final boolean inline) {
             this.name = name;
             this.value = value;
             this.inline = inline;
         }
 
-        public Field(Field field) {
+        public Field(final Field field) {
             if (field != null) {
                 this.name = field.getName();
                 this.value = field.getValue();
@@ -557,23 +564,23 @@ public class EmbedDTO implements Serializable {
         }
 
         public String getName() {
-            return name;
+            return this.name;
         }
 
         public String getValue() {
-            return value;
+            return this.value;
         }
 
         public boolean isInline() {
-            return inline;
+            return this.inline;
         }
 
         @Override
         public String toString() {
             return "Field{" +
-                    "name='" + name + '\'' +
-                    ", value='" + value + '\'' +
-                    ", inline=" + inline +
+                    "name='" + this.name + '\'' +
+                    ", value='" + this.value + '\'' +
+                    ", inline=" + this.inline +
                     '}';
         }
     }

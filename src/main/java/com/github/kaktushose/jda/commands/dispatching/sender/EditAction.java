@@ -2,13 +2,12 @@ package com.github.kaktushose.jda.commands.dispatching.sender;
 
 import com.github.kaktushose.jda.commands.embeds.EmbedDTO;
 import com.github.kaktushose.jda.commands.interactions.components.Component;
+import java.util.function.Consumer;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 /**
  * Generic interface holding edit methods. Uses a {@link EditCallback} to edit the replies.
@@ -26,8 +25,8 @@ public interface EditAction {
      *
      * @param message the new message
      */
-    default void edit(@NotNull String message) {
-        edit(message, (Consumer<Message>) null);
+    default void edit(@NotNull final String message) {
+        this.edit(message, (Consumer<Message>) null);
     }
 
     /**
@@ -37,40 +36,22 @@ public interface EditAction {
      * @param args   Arguments referenced by the format specifiers in the format string. If there are more arguments than
      *               format specifiers, the extra arguments are ignored. The number of arguments is variable and may be
      *               zero.
+     *
      * @throws java.util.IllegalFormatException If a format string contains an illegal syntax, a format specifier that
      *                                          is incompatible with the given arguments, insufficient arguments given
      *                                          the format string, or other illegal conditions.
      */
-    default void edit(@NotNull String format, @NotNull Object... args) {
-        edit(String.format(format, args));
+    default void edit(@NotNull final String format, @NotNull final Object... args) {
+        this.edit(String.format(format, args));
     }
-
-    /**
-     * Edits the original message the button is attached to.
-     *
-     * @param message the new {@code Message}
-     */
-    default void edit(@NotNull Message message) {
-        edit(message, null);
-    }
-
-    /**
-     * Edits the original message the button is attached to.
-     *
-     * @param builder the new {@code MessageBuilder}
-     */
-    default void edit(@NotNull MessageBuilder builder) {
-        edit(builder, null);
-    }
-
 
     /**
      * Edits the original message the button is attached to.
      *
      * @param builder the new {@code EmbedBuilder}
      */
-    default void edit(@NotNull EmbedBuilder builder) {
-        edit(builder, null);
+    default void edit(@NotNull final EmbedBuilder builder) {
+        this.edit(builder, null);
     }
 
     /**
@@ -78,8 +59,8 @@ public interface EditAction {
      *
      * @param embedDTO the new {@link EmbedDTO}
      */
-    default void edit(@NotNull EmbedDTO embedDTO) {
-        edit(embedDTO, null);
+    default void edit(@NotNull final EmbedDTO embedDTO) {
+        this.edit(embedDTO, null);
     }
 
     /**
@@ -88,22 +69,11 @@ public interface EditAction {
      *
      * @param message the new message
      * @param success the JDA RestAction success consumer
-     * @see <a href="https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/requests/RestAction.html">JDA RestAction Documentation</a>
-     */
-    default void edit(@NotNull String message, @Nullable Consumer<Message> success) {
-        getEditCallback().editMessage(message, success);
-    }
-
-    /**
-     * Edits the original message the button is attached to. This method also allows to access the JDA RestAction
-     * consumer.
      *
-     * @param message the new {@link Message}
-     * @param success the JDA RestAction success consumer
      * @see <a href="https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/requests/RestAction.html">JDA RestAction Documentation</a>
      */
-    default void edit(@NotNull Message message, @Nullable Consumer<Message> success) {
-        getEditCallback().editMessage(message, success);
+    default void edit(@NotNull final String message, @Nullable final Consumer<Message> success) {
+        this.getEditCallback().editMessage(message, success);
     }
 
     /**
@@ -112,22 +82,24 @@ public interface EditAction {
      *
      * @param builder the new {@link EmbedBuilder}
      * @param success the JDA RestAction success consumer
+     *
      * @see <a href="https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/requests/RestAction.html">JDA RestAction Documentation</a>
      */
-    default void edit(@NotNull EmbedBuilder builder, @Nullable Consumer<Message> success) {
-        getEditCallback().editMessage(builder, success);
+    default void edit(@NotNull final EmbedBuilder builder, @Nullable final Consumer<Message> success) {
+        this.getEditCallback().editMessage(builder, success);
     }
 
     /**
      * Edits the original message the button is attached to. This method also allows to access the JDA RestAction
      * consumer.
      *
-     * @param builder the new {@link MessageBuilder}
+     * @param builder the new {@link MessageEditBuilder}
      * @param success the JDA RestAction success consumer
+     *
      * @see <a href="https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/requests/RestAction.html">JDA RestAction Documentation</a>
      */
-    default void edit(@NotNull MessageBuilder builder, @Nullable Consumer<Message> success) {
-        getEditCallback().editMessage(builder, success);
+    default void edit(@NotNull final MessageEditBuilder builder, @Nullable final Consumer<Message> success) {
+        this.getEditCallback().editMessage(builder, success);
     }
 
     /**
@@ -136,10 +108,11 @@ public interface EditAction {
      *
      * @param embedDTO the new {@link EmbedDTO}
      * @param success  the JDA RestAction success consumer
+     *
      * @see <a href="https://ci.dv8tion.net/job/JDA/javadoc/net/dv8tion/jda/api/requests/RestAction.html">JDA RestAction Documentation</a>
      */
-    default void edit(@NotNull EmbedDTO embedDTO, @Nullable Consumer<Message> success) {
-        getEditCallback().editMessage(embedDTO, success);
+    default void edit(@NotNull final EmbedDTO embedDTO, @Nullable final Consumer<Message> success) {
+        this.getEditCallback().editMessage(embedDTO, success);
     }
 
     /**
@@ -148,6 +121,7 @@ public interface EditAction {
      * {@link com.github.kaktushose.jda.commands.annotations.Command Command}.
      *
      * @param components the {@link Component Components} to edit
+     *
      * @return the current instance for fluent interface
      */
     EditAction editComponents(@NotNull Component... components);
@@ -156,7 +130,7 @@ public interface EditAction {
      * Deletes the original message the button was attached to.
      */
     default EditAction deleteOriginal() {
-        getEditCallback().deleteOriginal();
+        this.getEditCallback().deleteOriginal();
         return this;
     }
 
@@ -166,7 +140,7 @@ public interface EditAction {
      * @return the current instance for fluent interface
      */
     default EditAction clearComponents() {
-        getEditCallback().editComponents();
+        this.getEditCallback().editComponents();
         return this;
     }
 
@@ -176,7 +150,7 @@ public interface EditAction {
      * for details.
      */
     default EditAction deferEdit() {
-        getEditCallback().deferEdit();
+        this.getEditCallback().deferEdit();
         return this;
     }
 

@@ -2,12 +2,11 @@ package com.github.kaktushose.jda.commands.dispatching.adapter.impl;
 
 import com.github.kaktushose.jda.commands.dispatching.CommandContext;
 import com.github.kaktushose.jda.commands.dispatching.adapter.TypeAdapter;
-import net.dv8tion.jda.api.entities.ChannelType;
+import java.util.Optional;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 /**
  * Type adapter for JDAs {@link Role}.
@@ -23,18 +22,19 @@ public class RoleAdapter implements TypeAdapter<Role> {
      *
      * @param raw     the String to parse
      * @param context the {@link CommandContext}
+     *
      * @return the parsed {@link Role} or an empty Optional if the parsing fails
      */
     @Override
-    public Optional<Role> parse(@NotNull String raw, @NotNull CommandContext context) {
+    public Optional<Role> parse(@NotNull String raw, @NotNull final CommandContext context) {
         if (!context.getEvent().isFromType(ChannelType.TEXT)) {
             return Optional.empty();
         }
 
-        Role role;
-        raw = sanitizeMention(raw);
+        final Role role;
+        raw = this.sanitizeMention(raw);
 
-        Guild guild = context.getEvent().getGuild();
+        final Guild guild = context.getEvent().getGuild();
         if (raw.matches("\\d+")) {
             role = guild.getRoleById(raw);
         } else {

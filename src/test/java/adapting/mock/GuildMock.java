@@ -1,13 +1,43 @@
 package adapting.mock;
 
+import java.time.OffsetDateTime;
+import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Icon;
+import net.dv8tion.jda.api.entities.Invite;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.ScheduledEvent;
+import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.VanityInvite;
+import net.dv8tion.jda.api.entities.Webhook;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.StageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.GuildSticker;
 import net.dv8tion.jda.api.entities.sticker.StickerSnowflake;
 import net.dv8tion.jda.api.entities.templates.Template;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.PrivilegeConfig;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -18,7 +48,14 @@ import net.dv8tion.jda.api.managers.GuildStickerManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.Response;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.*;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import net.dv8tion.jda.api.requests.restaction.ChannelAction;
+import net.dv8tion.jda.api.requests.restaction.CommandEditAction;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.requests.restaction.MemberAction;
+import net.dv8tion.jda.api.requests.restaction.RoleAction;
+import net.dv8tion.jda.api.requests.restaction.ScheduledEventAction;
 import net.dv8tion.jda.api.requests.restaction.order.CategoryOrderAction;
 import net.dv8tion.jda.api.requests.restaction.order.ChannelOrderAction;
 import net.dv8tion.jda.api.requests.restaction.order.RoleOrderAction;
@@ -32,11 +69,6 @@ import net.dv8tion.jda.api.utils.concurrent.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.temporal.TemporalAccessor;
-import java.util.*;
-import java.util.function.Consumer;
-
-@SuppressWarnings("ConstantConditions")
 public class GuildMock implements Guild {
 
     public static final Member MEMBER = new MemberMock("member", 1);
@@ -45,28 +77,28 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<Member> retrieveMemberById(@NotNull String id) {
+    public CacheRestAction<Member> retrieveMemberById(@NotNull final String id) {
         if (id.equals(MEMBER.getId())) {
-            return new RestActionMock<>(MEMBER);
+            return new CacheRestActionMock<>(MEMBER);
         }
         throw ErrorResponseException.create(ErrorResponse.UNKNOWN_USER, new Response(new IllegalArgumentException(), new HashSet<>()));
     }
 
     @NotNull
     @Override
-    public RestAction<Member> retrieveMemberById(long l, boolean b) {
+    public CacheRestAction<Member> retrieveMemberById(final long id) {
         return null;
     }
 
     @NotNull
     @Override
-    public Task<List<Member>> retrieveMembersByIds(boolean b, @NotNull long... longs) {
+    public Task<List<Member>> retrieveMembersByIds(final boolean b, @NotNull final long... longs) {
         return null;
     }
 
     @NotNull
     @Override
-    public Task<List<Member>> retrieveMembersByPrefix(@NotNull String s, int i) {
+    public Task<List<Member>> retrieveMembersByPrefix(@NotNull final String s, final int i) {
         return null;
     }
 
@@ -78,121 +110,139 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<Void> moveVoiceMember(@NotNull Member member, @Nullable AudioChannel audioChannel) {
+    public CacheRestAction<ScheduledEvent> retrieveScheduledEventById(@NotNull final String id) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> modifyNickname(@NotNull Member member, @Nullable String s) {
+    public RestAction<Void> moveVoiceMember(@NotNull final Member member, @Nullable final AudioChannel audioChannel) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Integer> prune(int i, boolean b, @NotNull Role... roles) {
+    public AuditableRestAction<Void> modifyNickname(@NotNull final Member member, @Nullable final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> kick(@NotNull UserSnowflake userSnowflake, @Nullable String s) {
+    public AuditableRestAction<Integer> prune(final int i, final boolean b, @NotNull final Role... roles) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> ban(@NotNull UserSnowflake userSnowflake, int i, @Nullable String s) {
+    public AuditableRestAction<Void> kick(@NotNull final UserSnowflake userSnowflake, @Nullable final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> unban(@NotNull UserSnowflake userSnowflake) {
+    public AuditableRestAction<Void> kick(@NotNull final UserSnowflake user) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> timeoutUntil(@NotNull UserSnowflake userSnowflake, @NotNull TemporalAccessor temporalAccessor) {
+    public AuditableRestAction<Void> ban(@NotNull final UserSnowflake user, final int deletionTimeframe, @NotNull final TimeUnit unit) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> removeTimeout(@NotNull UserSnowflake userSnowflake) {
+    public AuditableRestAction<Void> unban(@NotNull final UserSnowflake userSnowflake) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> deafen(@NotNull UserSnowflake userSnowflake, boolean b) {
+    public AuditableRestAction<Void> timeoutUntil(@NotNull final UserSnowflake userSnowflake, @NotNull final TemporalAccessor temporalAccessor) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> mute(@NotNull UserSnowflake userSnowflake, boolean b) {
+    public AuditableRestAction<Void> removeTimeout(@NotNull final UserSnowflake userSnowflake) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> addRoleToMember(@NotNull UserSnowflake userSnowflake, @NotNull Role role) {
+    public AuditableRestAction<Void> deafen(@NotNull final UserSnowflake userSnowflake, final boolean b) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> removeRoleFromMember(@NotNull UserSnowflake userSnowflake, @NotNull Role role) {
+    public AuditableRestAction<Void> mute(@NotNull final UserSnowflake userSnowflake, final boolean b) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> modifyMemberRoles(@NotNull Member member, @Nullable Collection<Role> collection, @Nullable Collection<Role> collection1) {
+    public AuditableRestAction<Void> addRoleToMember(@NotNull final UserSnowflake userSnowflake, @NotNull final Role role) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> modifyMemberRoles(@NotNull Member member, @NotNull Collection<Role> collection) {
+    public AuditableRestAction<Void> removeRoleFromMember(@NotNull final UserSnowflake userSnowflake, @NotNull final Role role) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> transferOwnership(@NotNull Member member) {
+    public AuditableRestAction<Void> modifyMemberRoles(@NotNull final Member member, @Nullable final Collection<Role> collection, @Nullable final Collection<Role> collection1) {
         return null;
     }
 
     @NotNull
     @Override
-    public ChannelAction<TextChannel> createTextChannel(@NotNull String s, @Nullable Category category) {
+    public AuditableRestAction<Void> modifyMemberRoles(@NotNull final Member member, @NotNull final Collection<Role> collection) {
         return null;
     }
 
     @NotNull
     @Override
-    public ChannelAction<NewsChannel> createNewsChannel(@NotNull String s, @Nullable Category category) {
+    public AuditableRestAction<Void> transferOwnership(@NotNull final Member member) {
         return null;
     }
 
     @NotNull
     @Override
-    public ChannelAction<VoiceChannel> createVoiceChannel(@NotNull String s, @Nullable Category category) {
+    public ChannelAction<TextChannel> createTextChannel(@NotNull final String s, @Nullable final Category category) {
         return null;
     }
 
     @NotNull
     @Override
-    public ChannelAction<StageChannel> createStageChannel(@NotNull String s, @Nullable Category category) {
+    public ChannelAction<NewsChannel> createNewsChannel(@NotNull final String s, @Nullable final Category category) {
         return null;
     }
 
     @NotNull
     @Override
-    public ChannelAction<Category> createCategory(@NotNull String s) {
+    public ChannelAction<VoiceChannel> createVoiceChannel(@NotNull final String s, @Nullable final Category category) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ChannelAction<StageChannel> createStageChannel(@NotNull final String s, @Nullable final Category category) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ChannelAction<ForumChannel> createForumChannel(@NotNull final String name, @Nullable final Category parent) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ChannelAction<Category> createCategory(@NotNull final String s) {
         return null;
     }
 
@@ -204,19 +254,31 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public AuditableRestAction<RichCustomEmoji> createEmoji(@NotNull String s, @NotNull Icon icon, @NotNull Role... roles) {
+    public AuditableRestAction<RichCustomEmoji> createEmoji(@NotNull final String s, @NotNull final Icon icon, @NotNull final Role... roles) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<GuildSticker> createSticker(@NotNull String s, @NotNull String s1, @NotNull FileUpload fileUpload, @NotNull Collection<String> collection) {
+    public AuditableRestAction<GuildSticker> createSticker(@NotNull final String s, @NotNull final String s1, @NotNull final FileUpload fileUpload, @NotNull final Collection<String> collection) {
         return null;
     }
 
     @NotNull
     @Override
-    public AuditableRestAction<Void> deleteSticker(@NotNull StickerSnowflake stickerSnowflake) {
+    public AuditableRestAction<Void> deleteSticker(@NotNull final StickerSnowflake stickerSnowflake) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ScheduledEventAction createScheduledEvent(@NotNull final String name, @NotNull final String location, @NotNull final OffsetDateTime startTime, @NotNull final OffsetDateTime endTime) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public ScheduledEventAction createScheduledEvent(@NotNull final String name, @NotNull final GuildChannel channel, @NotNull final OffsetDateTime startTime) {
         return null;
     }
 
@@ -240,19 +302,19 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public CategoryOrderAction modifyTextChannelPositions(@NotNull Category category) {
+    public CategoryOrderAction modifyTextChannelPositions(@NotNull final Category category) {
         return null;
     }
 
     @NotNull
     @Override
-    public CategoryOrderAction modifyVoiceChannelPositions(@NotNull Category category) {
+    public CategoryOrderAction modifyVoiceChannelPositions(@NotNull final Category category) {
         return null;
     }
 
     @NotNull
     @Override
-    public RoleOrderAction modifyRolePositions(boolean b) {
+    public RoleOrderAction modifyRolePositions(final boolean b) {
         return null;
     }
 
@@ -264,13 +326,19 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<Command> retrieveCommandById(@NotNull String s) {
+    public RestAction<List<Command>> retrieveCommands(final boolean withLocalizations) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Command> upsertCommand(@NotNull CommandData commandData) {
+    public RestAction<Command> retrieveCommandById(@NotNull final String s) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public RestAction<Command> upsertCommand(@NotNull final CommandData commandData) {
         return null;
     }
 
@@ -282,19 +350,19 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public CommandEditAction editCommandById(@NotNull String s) {
+    public CommandEditAction editCommandById(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Void> deleteCommandById(@NotNull String s) {
+    public RestAction<Void> deleteCommandById(@NotNull final String s) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<List<IntegrationPrivilege>> retrieveIntegrationPrivilegesById(@NotNull String s) {
+    public RestAction<List<IntegrationPrivilege>> retrieveIntegrationPrivilegesById(@NotNull final String s) {
         return null;
     }
 
@@ -306,13 +374,13 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<EnumSet<Region>> retrieveRegions(boolean b) {
+    public RestAction<EnumSet<Region>> retrieveRegions(final boolean b) {
         return null;
     }
 
     @NotNull
     @Override
-    public MemberAction addMember(@NotNull String s, @NotNull UserSnowflake userSnowflake) {
+    public MemberAction addMember(@NotNull final String s, @NotNull final UserSnowflake userSnowflake) {
         return null;
     }
 
@@ -327,7 +395,7 @@ public class GuildMock implements Guild {
     }
 
     @Override
-    public boolean unloadMember(long l) {
+    public boolean unloadMember(final long l) {
         return false;
     }
 
@@ -378,9 +446,8 @@ public class GuildMock implements Guild {
         return null;
     }
 
-    @NotNull
     @Override
-    public Locale getLocale() {
+    public DiscordLocale getLocale() {
         return null;
     }
 
@@ -465,7 +532,7 @@ public class GuildMock implements Guild {
     }
 
     @Override
-    public boolean isMember(@NotNull UserSnowflake userSnowflake) {
+    public boolean isMember(@NotNull final UserSnowflake userSnowflake) {
         return false;
     }
 
@@ -483,13 +550,13 @@ public class GuildMock implements Guild {
 
     @Nullable
     @Override
-    public Member getMember(@NotNull UserSnowflake userSnowflake) {
+    public Member getMember(@NotNull final UserSnowflake userSnowflake) {
         return null;
     }
 
     @NotNull
     @Override
-    public List<Member> getMembersByEffectiveName(@NotNull String name, boolean ignoreCase) {
+    public List<Member> getMembersByEffectiveName(@NotNull String name, final boolean ignoreCase) {
         String username = MEMBER.getNickname();
         if (ignoreCase) {
             username = username.toUpperCase();
@@ -497,7 +564,7 @@ public class GuildMock implements Guild {
         }
         if (name.equals(username)) {
             return new ArrayList<Member>() {{
-                add(MEMBER);
+                this.add(MEMBER);
             }};
         }
         return new ArrayList<>();
@@ -506,6 +573,12 @@ public class GuildMock implements Guild {
     @NotNull
     @Override
     public MemberCacheView getMemberCache() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public SortedSnowflakeCacheView<ScheduledEvent> getScheduledEventCache() {
         return null;
     }
 
@@ -547,13 +620,19 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public List<GuildChannel> getChannels(boolean b) {
+    public SortedSnowflakeCacheView<ForumChannel> getForumChannelCache() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public List<GuildChannel> getChannels(final boolean b) {
         return null;
     }
 
     @Nullable
     @Override
-    public Role getRoleById(@NotNull String id) {
+    public Role getRoleById(@NotNull final String id) {
         if (id.equals(ROLE.getId())) {
             return ROLE;
         }
@@ -562,7 +641,7 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public List<Role> getRolesByName(@NotNull String name, boolean ignoreCase) {
+    public List<Role> getRolesByName(@NotNull String name, final boolean ignoreCase) {
         String username = ROLE.getName();
         if (ignoreCase) {
             username = username.toUpperCase();
@@ -570,7 +649,7 @@ public class GuildMock implements Guild {
         }
         if (name.equals(username)) {
             return new ArrayList<Role>() {{
-                add(ROLE);
+                this.add(ROLE);
             }};
         }
         return new ArrayList<>();
@@ -602,7 +681,7 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<RichCustomEmoji> retrieveEmojiById(@NotNull String s) {
+    public RestAction<RichCustomEmoji> retrieveEmojiById(@NotNull final String s) {
         return null;
     }
 
@@ -614,13 +693,13 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<GuildSticker> retrieveSticker(@NotNull StickerSnowflake stickerSnowflake) {
+    public RestAction<GuildSticker> retrieveSticker(@NotNull final StickerSnowflake stickerSnowflake) {
         return null;
     }
 
     @NotNull
     @Override
-    public GuildStickerManager editSticker(@NotNull StickerSnowflake stickerSnowflake) {
+    public GuildStickerManager editSticker(@NotNull final StickerSnowflake stickerSnowflake) {
         return null;
     }
 
@@ -632,13 +711,13 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<Ban> retrieveBan(@NotNull UserSnowflake userSnowflake) {
+    public RestAction<Ban> retrieveBan(@NotNull final UserSnowflake userSnowflake) {
         return null;
     }
 
     @NotNull
     @Override
-    public RestAction<Integer> retrievePrunableMemberCount(int i) {
+    public RestAction<Integer> retrievePrunableMemberCount(final int i) {
         return null;
     }
 
@@ -648,9 +727,8 @@ public class GuildMock implements Guild {
         return null;
     }
 
-    @Nullable
     @Override
-    public BaseGuildMessageChannel getDefaultChannel() {
+    public DefaultGuildChannelUnion getDefaultChannel() {
         return null;
     }
 
@@ -685,7 +763,7 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<Void> delete(@Nullable String s) {
+    public RestAction<Void> delete(@Nullable final String s) {
         return null;
     }
 
@@ -727,7 +805,7 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public RestAction<Template> createTemplate(@NotNull String s, @Nullable String s1) {
+    public RestAction<Template> createTemplate(@NotNull final String s, @Nullable final String s1) {
         return null;
     }
 
@@ -769,13 +847,13 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public Task<Void> loadMembers(@NotNull Consumer<Member> consumer) {
+    public Task<Void> loadMembers(@NotNull final Consumer<Member> consumer) {
         return null;
     }
 
     @Nullable
     @Override
-    public TextChannel getTextChannelById(@NotNull String id) {
+    public TextChannel getTextChannelById(@NotNull final String id) {
         if (id.equals(TEXT_CHANNEL.getId())) {
             return TEXT_CHANNEL;
         }
@@ -784,7 +862,7 @@ public class GuildMock implements Guild {
 
     @NotNull
     @Override
-    public List<TextChannel> getTextChannelsByName(@NotNull String name, boolean ignoreCase) {
+    public List<TextChannel> getTextChannelsByName(@NotNull String name, final boolean ignoreCase) {
         String username = TEXT_CHANNEL.getName();
         if (ignoreCase) {
             username = username.toUpperCase();
@@ -792,7 +870,7 @@ public class GuildMock implements Guild {
         }
         if (name.equals(username)) {
             return new ArrayList<TextChannel>() {{
-                add(TEXT_CHANNEL);
+                this.add(TEXT_CHANNEL);
             }};
         }
         return new ArrayList<>();
