@@ -195,11 +195,11 @@ public class ParameterDefinition {
         }
 
         // Param
-        String name = parameter.getName();
+        String name = parameter.getName().toLowerCase();
         String description = "empty description";
         if (parameter.isAnnotationPresent(Param.class)) {
             final Param param = parameter.getAnnotation(Param.class);
-            name = param.name().isEmpty() ? name : param.name();
+            name = param.name().isEmpty() ? name : param.name().toLowerCase();
             description = param.value();
         }
 
